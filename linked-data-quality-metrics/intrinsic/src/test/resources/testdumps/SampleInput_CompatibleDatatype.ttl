@@ -1,0 +1,19 @@
+@prefix : <http://example.org/data/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+:_  :property "string"^^xsd:string .
+:_  :property "ħobża"^^xsd:string .
+:_  :property "string2" . #unknown
+:_  :property "12"^^xsd:byte .
+:_  :property "12821"^^xsd:short .
+:_  :property "12821"^^xsd:int .
+:_  :property "121.642"^^xsd:int . #incorrect
+:_  :property "-12821"^^xsd:long .
+:_  :property "true"^^xsd:boolean .
+:_  :property "false"^^xsd:boolean .
+:_  :property "false" .  #unknown
+:_  :property "121.642"^^xsd:double .
+:_  :property "-121.642"^^xsd:float .
+:_  :property "-121.642"^^xsd:dateTime . #incorrect
+:_  :property "2014-08-14T12:54:28.000Z"^^xsd:dateTime .
+:_  :property "2014-08-32T12:54:28.000Z"^^xsd:dateTime . #incorrect

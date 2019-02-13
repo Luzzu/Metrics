@@ -1,0 +1,54 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfg: <http://www.w3.org/2004/03/trix/rdfg-1> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix lmi: <http://purl.org/eis/vocab/lmi#> .
+
+
+_:EstimatedExtensionalConciseness a lmi:LuzzuMetricJavaImplementation ;
+	rdfs:label "Extensional Conciseness (Estimated)" ;
+	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.intrinsic.conciseness.EstimatedExtensionalConciseness" .
+
+_:ExtensionalConciseness a lmi:LuzzuMetricJavaImplementation ;
+	rdfs:label "Extensional Conciseness" ;
+	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.intrinsic.conciseness.ExtensionalConciseness" .
+
+_:EstimatedEntitiesAsMembersOfDisjointClasses a lmi:LuzzuMetricJavaImplementation ;
+	rdfs:label "Entities As Members Of Disjoint Classes" ;
+	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.intrinsic.consistency.EstimateSimpleEntitiesAsMembersOfDisjointClasses" .
+
+_:AdvancedEntitiesAsMembersOfDisjointClasses a lmi:LuzzuMetricJavaImplementation ;
+	rdfs:label "Advanced Entities As Members Of Disjoint Classes" ;
+	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.intrinsic.consistency.AdvancedEntitiesAsMembersOfDisjointClasses" .
+
+_:MisplacedClassesOrProperties a lmi:LuzzuMetricJavaImplementation ;
+	rdfs:label "Misplaced Classes Or Properties" ;
+	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.intrinsic.consistency.MisplacedClassesOrProperties" .
+
+_:MisusedOwlDatatypeOrObjectProperties a lmi:LuzzuMetricJavaImplementation ;
+	rdfs:label "Misused Owl Datatype Or Object Properties" ;
+	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.intrinsic.consistency.MisusedOwlDatatypeOrObjectProperties" .
+
+_:OntologyHijacking a lmi:LuzzuMetricJavaImplementation ;
+	rdfs:label "Ontology Hijacking" ;
+	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.intrinsic.consistency.OntologyHijacking" .
+
+_:UsageOfDeprecatedClassesOrProperties a lmi:LuzzuMetricJavaImplementation ;
+	rdfs:label "Usage Of Deprecated Classes Or Properties" ;
+	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.intrinsic.consistency.UsageOfDeprecatedClassesOrProperties" .
+
+_:EstimatedUsageOfIncorrectDomainOrRangeDatatypes a lmi:LuzzuMetricJavaImplementation ;
+	rdfs:label "Usage Of Deprecated Classes Or Properties" ;
+	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.intrinsic.consistency.EstimatedUsageOfIncorrectDomainOrRangeDatatypes" .
+
+_:ValidIFPUsage a lmi:LuzzuMetricJavaImplementation ;
+	rdfs:label "Valid IFP Usage" ;
+	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.intrinsic.consistency.ValidIFPUsage" .
+
+_:CompatibleDatatype a lmi:LuzzuMetricJavaImplementation ;
+	rdfs:label "Compatible Datatype" ;
+	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.intrinsic.syntacticvalidity.CompatibleDatatype" .
+
+_:CorrectLanguageTag a lmi:LuzzuMetricJavaImplementation ;
+	rdfs:label "Correct Language Tag" ;
+	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.intrinsic.syntacticvalidity.CorrectLanguageTag" .

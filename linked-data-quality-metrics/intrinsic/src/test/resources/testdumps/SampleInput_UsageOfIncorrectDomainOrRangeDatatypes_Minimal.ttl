@@ -1,0 +1,16 @@
+@prefix : <http://example.org/data/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+:Alice a foaf:Person ;
+	<http://purl.org/net/provenance/ns#containedBy> :Bob ;
+	foaf:name "Alice" ;
+	foaf:gender "female"^^xsd:string . 
+
+
+:DOW a foaf:Document ;
+	rdfs:label "Description of Work"@en .
+	
+:Bob a foaf:Person ;
+	foaf:givenName "Bob" .

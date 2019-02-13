@@ -1,0 +1,29 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfg: <http://www.w3.org/2004/03/trix/rdfg-1> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix lmi: <http://purl.org/eis/vocab/lmi#> .
+
+#--- Understandability Dimension -------------------------------------------------------------------------------------------------
+
+_:HumanReadableLabelling a lmi:LuzzuMetricJavaImplementation ;
+		rdfs:label "Human Readable Labelling and Description" ;
+		lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.contextual.understandability.HumanReadableLabelling" .
+
+_:PresenceOfURIRegEx a lmi:LuzzuMetricJavaImplementation ;
+		rdfs:label "Presence of a URI Regex in dataset" ;
+		lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.contextual.understandability.PresenceOfURIRegEx" .
+
+_:VocabularyUsageIndication a lmi:LuzzuMetricJavaImplementation ;
+		rdfs:label "Vocabulary Usage Indication" ;
+		lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.contextual.understandability.VocabularyUsageIndication" .
+
+#--- Provenance ---------------------------------------------------------------------------------------------------------------
+
+_:ExtendedProvenanceMetric a lmi:LuzzuMetricJavaImplementation ;
+	rdfs:label "Extended Provenance Metric" ;
+	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.contextual.provenance.ExtendedProvenanceMetric" .
+
+_:BasicProvenanceMetric a lmi:LuzzuMetricJavaImplementation ;
+	rdfs:label "Basic Provenance Metric" ;
+	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.contextual.provenance.BasicProvenanceMetric" .

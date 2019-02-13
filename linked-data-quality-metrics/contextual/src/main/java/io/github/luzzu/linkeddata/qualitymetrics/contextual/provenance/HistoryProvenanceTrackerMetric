@@ -1,0 +1,14 @@
+HistoryProvenanceTrackerMetric
+/**
+ * @author Jeremy Debattista
+ * 
+ * According the the Data on the Web BP W3C WG, "consumers
+ * need to know the origin or history of the published data... 
+ * data published should include or link to provenance information".
+ * 
+ * In the Extended Provenance Metric, the "origin" problem is tackled.
+ * This metric will identify discrepancies between the creation date
+ * and the modified date (this alone would also be a good indicator),
+ * and then checking if there are prov:Revision instances leading up
+ * to the last modified date. 
+ */

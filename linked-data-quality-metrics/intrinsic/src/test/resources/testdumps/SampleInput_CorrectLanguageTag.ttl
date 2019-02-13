@@ -1,0 +1,11 @@
+@prefix : <http://example.org/data/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+:_ :property "hello"@en .
+:_  :property """A few examples of how to embed tech expertise into policy making are TechCongress, the U.S. Digital Service, and the Presidential Innovation Fellows. These programs offer an extended opportunity for people with different experiences and backgrounds to work together to improve how government works"""@en .
+:_  :property "my name is jeremy"@it .
+:_  :property "my name is jeremy" .
+:_  :property "cazzo"@it .
+:_  :property "ħobż"@mt .
+:_  :property "նավթի սպառում"@mt .
+:_  :property "柏林爱乐管弦乐团，简称柏林爱乐，德国管弦乐团，成立于1882年。普遍认为柏林爱乐是世界级的管弦乐团。"@zh-cn

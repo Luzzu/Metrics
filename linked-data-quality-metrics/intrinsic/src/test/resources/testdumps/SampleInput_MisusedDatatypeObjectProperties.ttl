@@ -1,0 +1,9 @@
+@prefix : <http://example.org/data/> .
+@prefix gr: <http://purl.org/goodrelations/v1#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+
+:someBusinessEntity a gr:BusinessEntity ;
+	gr:name "Business Entity"  ; # this is OK
+	gr:legalName :SomeBusinessEntityLegalName ; # this is not OK
+	gr:offers :SomeObject ; # this is OK
+	gr:owns "Some Brand" . # this is not OK

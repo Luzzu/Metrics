@@ -1,0 +1,47 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>io.github.luzzu</groupId>
+		<artifactId>luzzu-quality-metrics</artifactId>
+		<version>2.0</version>
+	</parent>
+	<artifactId>linked-data-quality-metrics</artifactId>
+	<packaging>pom</packaging>
+	<name>Linked Data Quality Metrics</name>
+	<modules>
+
+		<module>representation</module>
+		<module>contextual</module>
+		<module>intrinsic</module>
+
+
+		<module>accessibility</module>
+	</modules>
+
+	<dependencies>
+		<!-- Luzzu Dependencies -->
+		<dependency>
+			<groupId>io.github.luzzu</groupId>
+			<artifactId>luzzu-annotations</artifactId>
+			<version>${luzzu.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.github.luzzu</groupId>
+			<artifactId>luzzu-io</artifactId> <!-- This dependency is needed for the dereferenceability metrics -->
+			<version>${luzzu.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.github.luzzu</groupId>
+			<artifactId>utilities</artifactId>
+			<version>2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>io.github.luzzu</groupId>
+			<artifactId>luzzu-ld-qualitymetrics-commons</artifactId>
+			<version>${luzzu.version}</version>
+		</dependency>
+	</dependencies>
+
+</project>
