@@ -58,25 +58,26 @@ public class MachineReadableLicense extends AbstractQualityMetric<Boolean> {
 		Node object = quad.getObject();
 		
 		
-		
-		if ((subject.getURI().equals(EnvironmentProperties.getInstance().getDatasetPLD()))
-			&& (licenseClassifier.isLicensingPredicate(predicate))) {
-			
-			if (object.isURI()) {
-				if ((licenseClassifier.isCopyLeftLicenseURI(object)) || (licenseClassifier.isNotRecommendedCopyLeftLicenseURI(object))) {
-					// We have a license and we have to check if it is machine readable
-					try{
-						Model licenseModel = RDFDataMgr.loadModel(object.getURI());
-						if (licenseClassifier.containsMachineReadableLicense(licenseModel)) this.hasValidMachineReadableLicense = true;
-						else {
+		if (!(subject.isBlank())) {
+			if ((subject.getURI().equals(EnvironmentProperties.getInstance().getDatasetPLD()))
+				&& (licenseClassifier.isLicensingPredicate(predicate))) {
+				
+				if (object.isURI()) {
+					if ((licenseClassifier.isCopyLeftLicenseURI(object)) || (licenseClassifier.isNotRecommendedCopyLeftLicenseURI(object))) {
+						// We have a license and we have to check if it is machine readable
+						try{
+							Model licenseModel = RDFDataMgr.loadModel(object.getURI());
+							if (licenseClassifier.containsMachineReadableLicense(licenseModel)) this.hasValidMachineReadableLicense = true;
+							else {
+								// add to problem report as DQMPROB.NotMachineReadableLicense
+							}
+						} catch (Exception e) {
 							// add to problem report as DQMPROB.NotMachineReadableLicense
 						}
-					} catch (Exception e) {
-						// add to problem report as DQMPROB.NotMachineReadableLicense
-					}
-					
-					if (licenseClassifier.isNotRecommendedCopyLeftLicenseURI(object)) {
-						// add to problem report as DQMPROB.NotRecommendedLicenceInDataset
+						
+						if (licenseClassifier.isNotRecommendedCopyLeftLicenseURI(object)) {
+							// add to problem report as DQMPROB.NotRecommendedLicenceInDataset
+						}
 					}
 				}
 			}

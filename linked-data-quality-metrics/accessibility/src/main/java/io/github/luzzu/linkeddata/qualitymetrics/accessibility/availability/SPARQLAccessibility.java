@@ -51,24 +51,25 @@ public class SPARQLAccessibility extends AbstractQualityMetric<Boolean> {
 	public void compute(Quad quad) {
 		logger.debug("Computing : {} ", quad.asTriple().toString());
 		
-		if ((quad.getSubject().getURI().equals(EnvironmentProperties.getInstance().getDatasetPLD()))
-				&& (endpointProperty.contains(quad.getPredicate().getURI()))) {
-
-			String sparqlQuerystring = "ASK {?s ?p ?o}";
-			Query query = QueryFactory.create(sparqlQuerystring);
-			
-
-			QueryExecution qexec = QueryExecutionFactory.sparqlService(quad.getObject().toString(), query);
-
-			try{
-				this.hasAccessibleEndpoint = qexec.execAsk();
-				qexec.close();
-			} catch (QueryException e){
-				logger.error("Endpoint " + quad.getObject().toString() + " responded with : " + e.getMessage());
-				// TODO: problem reporting
-				// Quad q = new Quad(null, quad.getSubject() , QPRO.exceptionDescription.asNode(), DQMPROB.InvalidSPARQLEndPoint.asNode());
+		if (!(quad.getSubject().isBlank())) {
+			if ((quad.getSubject().getURI().equals(EnvironmentProperties.getInstance().getDatasetPLD()))
+					&& (endpointProperty.contains(quad.getPredicate().getURI()))) {
+	
+				String sparqlQuerystring = "ASK {?s ?p ?o}";
+				Query query = QueryFactory.create(sparqlQuerystring);
+				
+	
+				QueryExecution qexec = QueryExecutionFactory.sparqlService(quad.getObject().toString(), query);
+	
+				try{
+					this.hasAccessibleEndpoint = qexec.execAsk();
+					qexec.close();
+				} catch (QueryException e){
+					logger.error("Endpoint " + quad.getObject().toString() + " responded with : " + e.getMessage());
+					// TODO: problem reporting
+					// Quad q = new Quad(null, quad.getSubject() , QPRO.exceptionDescription.asNode(), DQMPROB.InvalidSPARQLEndPoint.asNode());
+				}
 			}
-			
 		}
 	}
 	
