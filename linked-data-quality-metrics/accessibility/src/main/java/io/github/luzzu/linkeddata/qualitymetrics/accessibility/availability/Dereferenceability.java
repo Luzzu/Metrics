@@ -18,6 +18,7 @@ import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.github.luzzu.exceptions.MetricProcessingException;
 import io.github.luzzu.linkeddata.qualitymetrics.accessibility.availability.helper.Dereferencer;
 import io.github.luzzu.linkeddata.qualitymetrics.commons.AbstractQualityMetric;
 import io.github.luzzu.linkeddata.qualitymetrics.commons.HTTPRetriever;
@@ -67,7 +68,7 @@ public class Dereferenceability extends AbstractQualityMetric<Double> {
 	private boolean requireProblemReport = EnvironmentProperties.getInstance().requiresQualityProblemReport();
 
 	
-	public void compute(Quad quad) {
+	public void compute(Quad quad) throws MetricProcessingException {
 		logger.debug("Computing : {} ", quad.asTriple().toString());
 		
 		if (!(quad.getPredicate().getURI().equals(RDF.type.getURI()))){ // we are currently ignoring triples ?s a ?o

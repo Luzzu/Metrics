@@ -10,6 +10,7 @@ import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.github.luzzu.exceptions.MetricProcessingException;
 import io.github.luzzu.linkeddata.qualitymetrics.commons.AbstractQualityMetric;
 import io.github.luzzu.linkeddata.qualitymetrics.vocabulary.DQM;
 import io.github.luzzu.operations.properties.EnvironmentProperties;
@@ -49,7 +50,7 @@ public class MachineReadableLicense extends AbstractQualityMetric<Boolean> {
 	 * the URL of the subject in the map of resources confirmed to have licensing information
 	 * @param quad Quad to be processed and examined to try to extract the dataset's URI
 	 */
-	public void compute(Quad quad) {
+	public void compute(Quad quad) throws MetricProcessingException {
 		logger.debug("Computing : {} ", quad.asTriple().toString());
 
 		// Extract the predicate (property) of the statement, the described resource (subject) and the value set (object)

@@ -28,6 +28,7 @@ import org.mapdb.DB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.github.luzzu.exceptions.MetricProcessingException;
 import io.github.luzzu.linkeddata.qualitymetrics.commons.AbstractQualityMetric;
 import io.github.luzzu.linkeddata.qualitymetrics.commons.HTTPRetriever;
 import io.github.luzzu.linkeddata.qualitymetrics.commons.Utils;
@@ -81,7 +82,7 @@ public class LinkExternalDataProviders extends AbstractQualityMetric<Integer> {
 	
 	
 	@Override
-	public void compute(Quad quad) {
+	public void compute(Quad quad) throws MetricProcessingException {
 		logger.debug("Computing : {} ", quad.asTriple().toString());
 		
 		Node predicate = quad.getPredicate();

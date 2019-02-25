@@ -8,6 +8,7 @@ import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.github.luzzu.exceptions.MetricProcessingException;
 import io.github.luzzu.linkeddata.qualitymetrics.commons.AbstractQualityMetric;
 import io.github.luzzu.linkeddata.qualitymetrics.commons.HTTPRetriever;
 import io.github.luzzu.linkeddata.qualitymetrics.vocabulary.DQM;
@@ -53,7 +54,7 @@ public class LowLatency extends AbstractQualityMetric<Double> {
 	
 	ReservoirSampler<String> resSamp = new ReservoirSampler<String>(15,true);
 
-	public void compute(Quad quad) {
+	public void compute(Quad quad) throws MetricProcessingException {
 		if (quad.getSubject().isURI()){
 			if (this.getDatasetURI().equals("")){
 				if (!(quad.getSubject().getURI().startsWith("file"))) 

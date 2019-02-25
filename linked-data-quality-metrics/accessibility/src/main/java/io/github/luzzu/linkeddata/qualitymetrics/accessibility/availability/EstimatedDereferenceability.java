@@ -11,6 +11,7 @@ import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.github.luzzu.exceptions.MetricProcessingException;
 import io.github.luzzu.linkeddata.qualitymetrics.accessibility.availability.helper.Dereferencer;
 import io.github.luzzu.linkeddata.qualitymetrics.commons.AbstractQualityMetric;
 import io.github.luzzu.linkeddata.qualitymetrics.commons.HTTPRetriever;
@@ -82,7 +83,7 @@ public class EstimatedDereferenceability extends AbstractQualityMetric<Double> {
 	 * and object of the triple and adds them to the set of URIs to be evaluated for dereferenceability
 	 * @param quad Triple (in quad format) to be evaluated
 	 */
-	public void compute(Quad quad) {
+	public void compute(Quad quad) throws MetricProcessingException {
 		logger.debug("Computing : {} ", quad.asTriple().toString());
 		
 		// we are currently ignoring triples ?s a ?o

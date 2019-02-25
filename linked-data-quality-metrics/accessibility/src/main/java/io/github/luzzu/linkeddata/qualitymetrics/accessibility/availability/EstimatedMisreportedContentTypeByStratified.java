@@ -19,6 +19,7 @@ import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.github.luzzu.exceptions.MetricProcessingException;
 import io.github.luzzu.linkeddata.qualitymetrics.accessibility.availability.helper.ModelParser;
 import io.github.luzzu.linkeddata.qualitymetrics.accessibility.availability.helper.Tld;
 import io.github.luzzu.linkeddata.qualitymetrics.commons.AbstractQualityMetric;
@@ -82,7 +83,7 @@ public class EstimatedMisreportedContentTypeByStratified extends AbstractQuality
 	private Long nonSemanticResources = 0l;
 
 
-	public void compute(Quad quad) {
+	public void compute(Quad quad) throws MetricProcessingException {
 		logger.debug("Computing : {} ", quad.asTriple().toString());
 		
 		if (!(quad.getPredicate().getURI().equals(RDF.type.getURI()))){ 

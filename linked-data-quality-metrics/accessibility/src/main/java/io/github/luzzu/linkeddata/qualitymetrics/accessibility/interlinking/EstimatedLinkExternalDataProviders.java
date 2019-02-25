@@ -18,6 +18,7 @@ import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.github.luzzu.exceptions.MetricProcessingException;
 import io.github.luzzu.linkeddata.qualitymetrics.commons.HTTPRetriever;
 import io.github.luzzu.linkeddata.qualitymetrics.commons.Utils;
 import io.github.luzzu.qualitymetrics.algorithms.ReservoirSampler;
@@ -45,7 +46,7 @@ public class EstimatedLinkExternalDataProviders extends LinkExternalDataProvider
 	 * @param quad Quad to be processed as part of the computation of the metric
 	 */
 	@Override
-	public void compute(Quad quad) {
+	public void compute(Quad quad) throws MetricProcessingException {
 		logger.debug("Computing : {} ", quad.asTriple().toString());
 		
 		Node predicate = quad.getPredicate();

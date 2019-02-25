@@ -12,6 +12,7 @@ import org.apache.jena.vocabulary.VOID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.github.luzzu.exceptions.MetricProcessingException;
 import io.github.luzzu.linkeddata.qualitymetrics.commons.AbstractQualityMetric;
 import io.github.luzzu.linkeddata.qualitymetrics.vocabulary.DQM;
 import io.github.luzzu.operations.properties.EnvironmentProperties;
@@ -36,7 +37,7 @@ public class RDFAccessibility extends AbstractQualityMetric<Boolean> {
 	
 	
 
-	public void compute(Quad quad) {
+	public void compute(Quad quad) throws MetricProcessingException {
 		logger.debug("Computing : {} ", quad.asTriple().toString());
 		
 		if ((quad.getSubject().getURI().equals(EnvironmentProperties.getInstance().getDatasetPLD()))

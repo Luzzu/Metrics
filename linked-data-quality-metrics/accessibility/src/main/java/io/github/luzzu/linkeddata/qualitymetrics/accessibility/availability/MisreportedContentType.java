@@ -15,6 +15,7 @@ import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.github.luzzu.exceptions.MetricProcessingException;
 import io.github.luzzu.linkeddata.qualitymetrics.accessibility.availability.helper.Dereferencer;
 import io.github.luzzu.linkeddata.qualitymetrics.accessibility.availability.helper.ModelParser;
 import io.github.luzzu.linkeddata.qualitymetrics.commons.AbstractQualityMetric;
@@ -63,7 +64,7 @@ public class MisreportedContentType extends AbstractQualityMetric<Double> {
 	private ProblemCollection<Model> problemCollection = new ProblemCollectionModel(DQM.MisreportedContentTypesMetric);
 	private boolean requireProblemReport = EnvironmentProperties.getInstance().requiresQualityProblemReport();
 
-	public void compute(Quad quad) {
+	public void compute(Quad quad) throws MetricProcessingException {
 		logger.debug("Computing : {} ", quad.asTriple().toString());
 		
 		String subject = quad.getSubject().toString();
