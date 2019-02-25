@@ -74,23 +74,27 @@ public class HumanReadableLicense extends AbstractQualityMetric<Boolean> {
 		Node predicate = quad.getPredicate();
 		Node object = quad.getObject();
 		
-		if ((subject.getURI().equals(EnvironmentProperties.getInstance().getDatasetPLD()))) {
-			if (object.isURI() && licenseClassifier.isLicensingPredicate(predicate)) {
-				if ((licenseClassifier.isCopyLeftLicenseURI(object)) || (licenseClassifier.isNotRecommendedCopyLeftLicenseURI(object))) {
-					this.hasHumanReadableLicense = true;
-					
-					if (licenseClassifier.isNotRecommendedCopyLeftLicenseURI(object)) {
-						// add to problem report as DQMPROB.NotRecommendedLicenceInDataset
+		if (!(subject.isBlank())){
+			if ((subject.getURI().equals(EnvironmentProperties.getInstance().getDatasetPLD()))) {
+				if (object.isURI() && licenseClassifier.isLicensingPredicate(predicate)) {
+					if ((licenseClassifier.isCopyLeftLicenseURI(object)) || (licenseClassifier.isNotRecommendedCopyLeftLicenseURI(object))) {
+						this.hasHumanReadableLicense = true;
+						
+						if (licenseClassifier.isNotRecommendedCopyLeftLicenseURI(object)) {
+							// add to problem report as DQMPROB.NotRecommendedLicenceInDataset
+						}
 					}
+				} else if (object.isLiteral() && setLicensingDocumProps.contains(predicate.getURI())) {
+					this.hasHumanReadableLicense = licenseClassifier.isLicenseStatement(object);
+				} else {
+					// problem
 				}
-			} else if (object.isLiteral() && setLicensingDocumProps.contains(predicate.getURI())) {
-				this.hasHumanReadableLicense = licenseClassifier.isLicenseStatement(object);
 			} else {
 				// problem
 			}
-		} else {
-			// problem
 		}
+		
+
 		
 	}
 	
