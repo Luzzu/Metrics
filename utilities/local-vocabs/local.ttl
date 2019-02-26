@@ -1,0 +1,5 @@
+@prefix lmi: <http://purl.org/eis/vocab/lmi#> .
+
+_:madsrdf a lmi:LocalVocabulary ;
+	lmi:namespace "http://www.loc.gov/mads/rdf/v1#" ;
+	lmi:filename "madsrdf.xml" .

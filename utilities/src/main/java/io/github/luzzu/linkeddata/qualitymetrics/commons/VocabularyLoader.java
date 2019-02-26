@@ -6,10 +6,15 @@ package io.github.luzzu.linkeddata.qualitymetrics.commons;
 import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
@@ -50,6 +55,7 @@ import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 import io.github.luzzu.linkeddata.qualitymetrics.commons.cache.LinkedDataMetricsCacheManager;
 import io.github.luzzu.qualitymetrics.commons.cache.CachedVocabulary;
 import io.github.luzzu.semantics.commons.ResourceCommons;
+import io.github.luzzu.semantics.vocabularies.LMI;
 
 /**
  * @author Jeremy Debattista
@@ -162,12 +168,35 @@ public class VocabularyLoader {
 			synchronized(lock){
 				logger.debug("Creating Instance for Vocabulary Loader");
 				instance = new VocabularyLoader();
+				instance.checkforLocalVocabs();
 			}
 		}
 		return instance;
 	}
 	
 	// --- Vocabulary Loading Methods --- //
+	private void checkforLocalVocabs() {
+		Path dir = Paths.get("local-vocabs/");
+		Path configFile = Paths.get("local-vocabs/local.ttl");
+		
+		if (Files.exists(dir)) {
+			if (Files.exists(configFile)) {
+				logger.info("Loading Vocabularies");
+
+				Model m = ModelFactory.createDefaultModel().read(configFile.toString());
+				List<Resource> iter = m.listResourcesWithProperty(RDF.type, LMI.LocalVocabulary).toList();
+				iter.forEach(r -> {
+					Optional<RDFNode> namespace = m.listObjectsOfProperty(r, LMI.namespace).nextOptional();
+					Optional<RDFNode> filename = m.listObjectsOfProperty(r, LMI.filename).nextOptional();
+					if (namespace.isPresent() && filename.isPresent()) {
+						logger.info("Loading vocabulary: "+ filename.get().asLiteral().getString());
+						knownDatasets.put(namespace.get().asLiteral().getString(), filename.get().asLiteral().getString());
+					}
+				});
+			}
+		}
+	}
+	
 	public void loadVocabulary(String vocabURI){
 		if(!(this.dataset.containsNamedModel(vocabURI))) 
 			this.loadNStoDataset(vocabURI);
@@ -999,16 +1028,13 @@ public class VocabularyLoader {
 	}
 	
 	
-	public static void main(String [] args) {
-		
-//		Node n = ModelFactory.createDefaultModel().createResource("http://dbpedia.org/property/clubB&").asNode();
-//		System.out.println(VocabularyLoader.getInstance().checkTerm(n));
-		
-		
-		Node n = ModelFactory.createDefaultModel().createResource("http://www.wikidata.org/entity/Q33999").asNode();
-		System.out.println(VocabularyLoader.getInstance().checkTerm(n));
-		
-		
-	}
+//	public static void main(String [] args) {
+////		Node n = ModelFactory.createDefaultModel().createResource("http://dbpedia.org/property/clubB&").asNode();
+////		System.out.println(VocabularyLoader.getInstance().checkTerm(n));
+
+////		Node n = ModelFactory.createDefaultModel().createResource("http://www.wikidata.org/entity/Q33999").asNode();
+////		System.out.println(VocabularyLoader.getInstance().checkTerm(n));
+//		VocabularyLoader.getInstance();
+//	}
 	
 }
