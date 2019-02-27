@@ -7,7 +7,14 @@ public class Utils {
 			return null;
 		}
 		
-		if (targetURL.contains("#")) return targetURL.substring(0, targetURL.indexOf("#"));
-		else return targetURL.substring(0, targetURL.lastIndexOf("/"));
-	}
+		if ((targetURL.startsWith("http")) || (targetURL.startsWith("https"))){
+			try {
+				if (targetURL.contains("#")) return targetURL.substring(0, targetURL.indexOf("#"));
+				else return targetURL.substring(0, targetURL.lastIndexOf("/"));
+			} catch (StringIndexOutOfBoundsException ex) {
+				return targetURL;
+			}
+		} else
+			return targetURL;
+	}	
 }
