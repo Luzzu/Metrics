@@ -80,7 +80,9 @@ public class VocabularyLoader {
 	// --- Vocabulary Storage and Cache --- //
 	private LinkedDataMetricsCacheManager dcm = LinkedDataMetricsCacheManager.getInstance();
 	private Dataset dataset = DatasetFactory.createGeneral();
-	private ConcurrentMap<String, String> knownDatasets = new ConcurrentHashMap<String,String>();
+	private ConcurrentMap<String, String> knownVocabularies = new ConcurrentHashMap<String,String>();
+	private ConcurrentMap<String, String> localKnownVocabularies = new ConcurrentHashMap<String,String>();
+
 	
 	// --- LRU Caches --- //
     private ConcurrentMap<String, Boolean> termsExists = new ConcurrentLinkedHashMap.Builder<String, Boolean>().maximumWeightedCapacity(10000).build();
@@ -104,62 +106,62 @@ public class VocabularyLoader {
 
 	// --- Constructor and Instance --- //
 	private VocabularyLoader(){
-		knownDatasets.put("http://dbpedia.org/ontology/","dbpedia.nt");
-		knownDatasets.put("http://www.w3.org/1999/02/22-rdf-syntax-ns#","rdf.rdf");
-		knownDatasets.put("http://www.w3.org/2000/01/rdf-schema#","rdfs.rdf");
-		knownDatasets.put("http://xmlns.com/foaf/0.1/","foaf.rdf");
-		knownDatasets.put("http://purl.org/dc/terms/","dcterm.rdf");
-		knownDatasets.put("http://purl.org/dc/elements/1.1/","dcelements.ttl");
-		knownDatasets.put("http://www.w3.org/2002/07/owl#","owl.rdf");
-		knownDatasets.put("http://www.w3.org/2003/01/geo/wgs84_pos#","pos.rdf");
-		knownDatasets.put("http://rdfs.org/sioc/ns#","sioc.rdf");
+		knownVocabularies.put("http://dbpedia.org/ontology/","dbpedia.nt");
+		knownVocabularies.put("http://www.w3.org/1999/02/22-rdf-syntax-ns#","rdf.rdf");
+		knownVocabularies.put("http://www.w3.org/2000/01/rdf-schema#","rdfs.rdf");
+		knownVocabularies.put("http://xmlns.com/foaf/0.1/","foaf.rdf");
+		knownVocabularies.put("http://purl.org/dc/terms/","dcterm.rdf");
+		knownVocabularies.put("http://purl.org/dc/elements/1.1/","dcelements.ttl");
+		knownVocabularies.put("http://www.w3.org/2002/07/owl#","owl.rdf");
+		knownVocabularies.put("http://www.w3.org/2003/01/geo/wgs84_pos#","pos.rdf");
+		knownVocabularies.put("http://rdfs.org/sioc/ns#","sioc.rdf");
 //		knownDatasets.put("http://webns.net/mvcb/","admin.rdf");
-		knownDatasets.put("http://www.w3.org/2004/02/skos/core#","skos.rdf");
-		knownDatasets.put("http://rdfs.org/ns/void#","void.rdf"); //TODO update new namespace
-		knownDatasets.put("http://purl.org/vocab/bio/0.1/","bio.rdf");
-		knownDatasets.put("http://purl.org/linked-data/cube#","cube.ttl");
-		knownDatasets.put("http://purl.org/rss/1.0/","rss.rdf");
-		knownDatasets.put("http://www.w3.org/2000/10/swap/pim/contact#","w3con.rdf");
-		knownDatasets.put("http://usefulinc.com/ns/doap#","doap.rdf");
-		knownDatasets.put("http://purl.org/ontology/bibo/","bibo.rdf");
-		knownDatasets.put("http://www.w3.org/ns/dcat#","dcat.rdf");
-		knownDatasets.put("http://www.w3.org/ns/auth/cert#","cert.rdf");
-		knownDatasets.put("http://purl.org/linked-data/sdmx/2009/dimension#","sdmxd.ttl");
-		knownDatasets.put("http://www.daml.org/2001/10/html/airport-ont#","airport.rdf");
-		knownDatasets.put("http://xmlns.com/wot/0.1/","wot.rdf");
+		knownVocabularies.put("http://www.w3.org/2004/02/skos/core#","skos.rdf");
+		knownVocabularies.put("http://rdfs.org/ns/void#","void.rdf"); //TODO update new namespace
+		knownVocabularies.put("http://purl.org/vocab/bio/0.1/","bio.rdf");
+		knownVocabularies.put("http://purl.org/linked-data/cube#","cube.ttl");
+		knownVocabularies.put("http://purl.org/rss/1.0/","rss.rdf");
+		knownVocabularies.put("http://www.w3.org/2000/10/swap/pim/contact#","w3con.rdf");
+		knownVocabularies.put("http://usefulinc.com/ns/doap#","doap.rdf");
+		knownVocabularies.put("http://purl.org/ontology/bibo/","bibo.rdf");
+		knownVocabularies.put("http://www.w3.org/ns/dcat#","dcat.rdf");
+		knownVocabularies.put("http://www.w3.org/ns/auth/cert#","cert.rdf");
+		knownVocabularies.put("http://purl.org/linked-data/sdmx/2009/dimension#","sdmxd.ttl");
+		knownVocabularies.put("http://www.daml.org/2001/10/html/airport-ont#","airport.rdf");
+		knownVocabularies.put("http://xmlns.com/wot/0.1/","wot.rdf");
 //		knownDatasets.put("http://purl.org/rss/1.0/modules/content/","content.rdf");
-		knownDatasets.put("http://creativecommons.org/ns#","cc.rdf");
-		knownDatasets.put("http://purl.org/vocab/relationship/","ref.rdf");
+		knownVocabularies.put("http://creativecommons.org/ns#","cc.rdf");
+		knownVocabularies.put("http://purl.org/vocab/relationship/","ref.rdf");
 //		knownDatasets.put("http://xmlns.com/wordnet/1.6/","wn.rdf");
-		knownDatasets.put("http://rdfs.org/sioc/types#","tsioc.rdf");
-		knownDatasets.put("http://www.w3.org/2006/vcard/ns#","vcard2006.rdf");
-		knownDatasets.put("http://purl.org/linked-data/sdmx/2009/attribute#","sdmxa.ttl");
-		knownDatasets.put("http://www.geonames.org/ontology#","gn.rdf");
-		knownDatasets.put("http://data.semanticweb.org/ns/swc/ontology#","swc.rdf");
-		knownDatasets.put("http://purl.org/dc/dcmitype/","dctypes.rdf");
-		knownDatasets.put("http://purl.org/net/provenance/ns#","hartigprov.rdf");
-		knownDatasets.put("http://www.w3.org/ns/sparql-service-description#","sd.rdf");
-		knownDatasets.put("http://open.vocab.org/terms/","open.ttl");
-		knownDatasets.put("http://www.w3.org/ns/prov#","prov.rdf");
-		knownDatasets.put("http://purl.org/vocab/resourcelist/schema#","resource.rdf");
-		knownDatasets.put("http://rdvocab.info/elements/","rda.rdf");
-		knownDatasets.put("http://purl.org/net/provenance/types#","prvt.rdf");
-		knownDatasets.put("http://purl.org/NET/c4dm/event.owl#","c4dm.rdf");
-		knownDatasets.put("http://purl.org/goodrelations/v1#","gr.rdf");
-		knownDatasets.put("http://www.w3.org/ns/auth/rsa#","rsa.rdf");
-		knownDatasets.put("http://purl.org/vocab/aiiso/schema#","aiiso.rdf");
-		knownDatasets.put("http://purl.org/net/pingback/","pingback.rdf");
-		knownDatasets.put("http://www.w3.org/2006/time#","time.rdf");
-		knownDatasets.put("http://www.w3.org/ns/org#","org.rdf");
-		knownDatasets.put("http://www.w3.org/2007/05/powder-s#","wdrs.rdf");
-		knownDatasets.put("http://www.w3.org/2003/06/sw-vocab-status/ns#","vs.rdf");
-		knownDatasets.put("http://purl.org/vocab/vann/","vann.rdf");
-		knownDatasets.put("http://www.w3.org/2002/12/cal/icaltzd#","icaltzd.rdf");
-		knownDatasets.put("http://purl.org/vocab/frbr/core#","frbrcore.rdf");
-		knownDatasets.put("http://www.w3.org/1999/xhtml/vocab#","xhv.rdf");
-		knownDatasets.put("http://purl.org/vocab/lifecycle/schema#","lcy.rdf");
-		knownDatasets.put("http://www.w3.org/2004/03/trix/rdfg-1/","rdfg.rdf");
-		knownDatasets.put("http://schema.org/", "schema.rdf"); //added schema.org since it does not allow content negotiation
+		knownVocabularies.put("http://rdfs.org/sioc/types#","tsioc.rdf");
+		knownVocabularies.put("http://www.w3.org/2006/vcard/ns#","vcard2006.rdf");
+		knownVocabularies.put("http://purl.org/linked-data/sdmx/2009/attribute#","sdmxa.ttl");
+		knownVocabularies.put("http://www.geonames.org/ontology#","gn.rdf");
+		knownVocabularies.put("http://data.semanticweb.org/ns/swc/ontology#","swc.rdf");
+		knownVocabularies.put("http://purl.org/dc/dcmitype/","dctypes.rdf");
+		knownVocabularies.put("http://purl.org/net/provenance/ns#","hartigprov.rdf");
+		knownVocabularies.put("http://www.w3.org/ns/sparql-service-description#","sd.rdf");
+		knownVocabularies.put("http://open.vocab.org/terms/","open.ttl");
+		knownVocabularies.put("http://www.w3.org/ns/prov#","prov.rdf");
+		knownVocabularies.put("http://purl.org/vocab/resourcelist/schema#","resource.rdf");
+		knownVocabularies.put("http://rdvocab.info/elements/","rda.rdf");
+		knownVocabularies.put("http://purl.org/net/provenance/types#","prvt.rdf");
+		knownVocabularies.put("http://purl.org/NET/c4dm/event.owl#","c4dm.rdf");
+		knownVocabularies.put("http://purl.org/goodrelations/v1#","gr.rdf");
+		knownVocabularies.put("http://www.w3.org/ns/auth/rsa#","rsa.rdf");
+		knownVocabularies.put("http://purl.org/vocab/aiiso/schema#","aiiso.rdf");
+		knownVocabularies.put("http://purl.org/net/pingback/","pingback.rdf");
+		knownVocabularies.put("http://www.w3.org/2006/time#","time.rdf");
+		knownVocabularies.put("http://www.w3.org/ns/org#","org.rdf");
+		knownVocabularies.put("http://www.w3.org/2007/05/powder-s#","wdrs.rdf");
+		knownVocabularies.put("http://www.w3.org/2003/06/sw-vocab-status/ns#","vs.rdf");
+		knownVocabularies.put("http://purl.org/vocab/vann/","vann.rdf");
+		knownVocabularies.put("http://www.w3.org/2002/12/cal/icaltzd#","icaltzd.rdf");
+		knownVocabularies.put("http://purl.org/vocab/frbr/core#","frbrcore.rdf");
+		knownVocabularies.put("http://www.w3.org/1999/xhtml/vocab#","xhv.rdf");
+		knownVocabularies.put("http://purl.org/vocab/lifecycle/schema#","lcy.rdf");
+		knownVocabularies.put("http://www.w3.org/2004/03/trix/rdfg-1/","rdfg.rdf");
+		knownVocabularies.put("http://schema.org/", "schema.rdf"); //added schema.org since it does not allow content negotiation
 	}
 	
 	
@@ -182,7 +184,7 @@ public class VocabularyLoader {
 		if (Files.exists(dir)) {
 			if (Files.exists(configFile)) {
 				logger.info("Loading Vocabularies");
-
+				
 				Model m = ModelFactory.createDefaultModel().read(configFile.toString());
 				List<Resource> iter = m.listResourcesWithProperty(RDF.type, LMI.LocalVocabulary).toList();
 				iter.forEach(r -> {
@@ -190,7 +192,7 @@ public class VocabularyLoader {
 					Optional<RDFNode> filename = m.listObjectsOfProperty(r, LMI.filename).nextOptional();
 					if (namespace.isPresent() && filename.isPresent()) {
 						logger.info("Loading vocabulary: "+ filename.get().asLiteral().getString());
-						knownDatasets.put(namespace.get().asLiteral().getString(), filename.get().asLiteral().getString());
+						localKnownVocabularies.put(namespace.get().asLiteral().getString(), filename.get().asLiteral().getString());
 					}
 				});
 			}
@@ -203,8 +205,11 @@ public class VocabularyLoader {
 	}
 
 	private synchronized void loadNStoDataset(String ns){
-		if (this.knownDatasets.containsKey(ns)){
-			Model m = RDFDataMgr.loadModel("vocabs/" + this.knownDatasets.get(ns));
+		if (this.knownVocabularies.containsKey(ns)){
+			Model m = RDFDataMgr.loadModel("vocabs/" + this.knownVocabularies.get(ns));
+			this.dataset.addNamedModel(ns, m);
+		} else if (this.localKnownVocabularies.containsKey(ns)) {
+			Model m = RDFDataMgr.loadModel("local-vocabs/" + this.localKnownVocabularies.get(ns));
 			this.dataset.addNamedModel(ns, m);
 		} else {
 			//download and store in cache
@@ -225,8 +230,8 @@ public class VocabularyLoader {
 	}
 	
 	private synchronized void loadNStoDataset(String ns, Node term){
-		if (this.knownDatasets.containsKey(ns)){
-			Model m = RDFDataMgr.loadModel("vocabs/" + this.knownDatasets.get(ns));
+		if (this.knownVocabularies.containsKey(ns)){
+			Model m = RDFDataMgr.loadModel("vocabs/" + this.knownVocabularies.get(ns));
 			this.dataset.addNamedModel(ns, m);
 		} else {
 			//download and store in cache
@@ -443,7 +448,7 @@ public class VocabularyLoader {
 	}
 
 	public Boolean knownVocabulary(String uri){
-		return (knownDatasets.containsKey(uri) || dataset.containsNamedModel(uri));
+		return (knownVocabularies.containsKey(uri) || dataset.containsNamedModel(uri));
 	}
 	
 	public Model getModelForVocabulary(String ns){
@@ -458,7 +463,7 @@ public class VocabularyLoader {
 		if (term.getURI().contains("#")){
 			//it is a hash URI then we can use the namespace to download the vocabulary
 			ns = term.getNameSpace();
-		} else if (this.knownDatasets.containsKey(term.getNameSpace())) {
+		} else if (this.knownVocabularies.containsKey(term.getNameSpace())) {
 			// if not hash URI but we know the vocabulary, e.g the open vocab
 			ns = term.getNameSpace();
 		}
@@ -1030,11 +1035,12 @@ public class VocabularyLoader {
 	
 //	public static void main(String [] args) {
 ////		Node n = ModelFactory.createDefaultModel().createResource("http://dbpedia.org/property/clubB&").asNode();
-////		System.out.println(VocabularyLoader.getInstance().checkTerm(n));
-
-////		Node n = ModelFactory.createDefaultModel().createResource("http://www.wikidata.org/entity/Q33999").asNode();
-////		System.out.println(VocabularyLoader.getInstance().checkTerm(n));
-//		VocabularyLoader.getInstance();
+//////		System.out.println(VocabularyLoader.getInstance().checkTerm(n));
+//
+//		Node n = ModelFactory.createDefaultModel().createResource("http://iflastandards.info/ns/unimarc/unimarcb/elements/801/U801_3b").asNode();
+//		System.out.println(VocabularyLoader.getInstance().checkTerm(n));
+////		VocabularyLoader.getInstance();
+////		loadNStoDataset(n);
 //	}
 	
 }
