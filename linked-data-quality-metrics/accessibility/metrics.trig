@@ -3,69 +3,87 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix lmi: <http://purl.org/eis/vocab/lmi#> .
+@prefix dqm:     <http://purl.org/eis/vocab/dqm#> .
 
-#--- Availability Dimension ------------------------------------------------------------------------------------------------- 
+#--- Availability Dimension -------------------------------------------------------------------------------------------------
 
 _:Dereferenceability a lmi:LuzzuMetricJavaImplementation ;
 	rdfs:label "Dereferenceability" ;
-	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.accessibility.availability.Dereferenceability" .
-		
+	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.accessibility.availability.Dereferenceability" ;
+	lmi:referTo dqm:DereferenceabilityMetric .
+
 _:EstimatedDereferenceability a lmi:LuzzuMetricJavaImplementation ;
 	rdfs:label "Dereferenceability (Estimated)" ;
-	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.accessibility.availability.EstimatedDereferenceability" .
+	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.accessibility.availability.EstimatedDereferenceability" ;
+	lmi:referTo dqm:DereferenceabilityMetric .
+
 
 _:EstimatedDereferenceabilityByStratified a lmi:LuzzuMetricJavaImplementation ;
 	rdfs:label "Dereferenceability (Estimated using Strata) - Recommended" ;
-	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.accessibility.availability.EstimatedDereferenceabilityByStratified" .
+	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.accessibility.availability.EstimatedDereferenceabilityByStratified" ;
+	lmi:referTo dqm:DereferenceabilityMetric .
+
 
 _:EstimatedDereferenceabilityByTLD a lmi:LuzzuMetricJavaImplementation ;
 	rdfs:label "Dereferenceability (Estimated using TLDs)" ;
-	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.accessibility.availability.EstimatedDereferenceabilityByTLD" .
+	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.accessibility.availability.EstimatedDereferenceabilityByTLD" ;
+	lmi:referTo dqm:DereferenceabilityMetric .
+
 
 
 _:MisreportedContentType a lmi:LuzzuMetricJavaImplementation ;
 	rdfs:label "Misreported Content Types" ;
-	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.accessibility.availability.MisreportedContentType" .
-	
+	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.accessibility.availability.MisreportedContentType" ;
+	lmi:referTo dqm:MisreportedContentTypesMetric .
+
 _:EstimatedMisreportedContentType a lmi:LuzzuMetricJavaImplementation ;
 	rdfs:label "Misreported Content Types (Estimated)" ;
-	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.accessibility.availability.EstimatedMisreportedContentTypeByStratified" .
-	
+	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.accessibility.availability.EstimatedMisreportedContentTypeByStratified" ;
+	lmi:referTo dqm:MisreportedContentTypesMetric .
+
 _:RDFAccessibility a lmi:LuzzuMetricJavaImplementation ;
 	rdfs:label "RDF Accessibility" ;
-	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.accessibility.availability.RDFAccessibility" .
-	
+	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.accessibility.availability.RDFAccessibility" ;
+	lmi:referTo dqm:RDFAvailabilityMetric .
+
 _:SPARQLAccessibility a lmi:LuzzuMetricJavaImplementation ;
 	rdfs:label "SPARQL Accessibility" ;
-	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.accessibility.availability.SPARQLAccessibility" .
+	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.accessibility.availability.SPARQLAccessibility" ;
+	lmi:referTo dqm:EndPointAvailabilityMetric .
 
 #--- Interlinking Dimension -------------------------------------------------------------------------------------------------
-	
+
 _:LinkExternalDataProviders a lmi:LuzzuMetricJavaImplementation ;
 	rdfs:label "Links to External Data Providers" ;
-	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.accessibility.interlinking.LinkExternalDataProviders" .
-	
+	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.accessibility.interlinking.LinkExternalDataProviders" ;
+	lmi:referTo dqm:LinksToExternalDataProvidersMetric .
+
 _:EstimatedLinkExternalDataProviders a lmi:LuzzuMetricJavaImplementation ;
 	rdfs:label "Links to External Data Providers (Estimated)" ;
-	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.accessibility.interlinking.EstimatedLinkExternalDataProviders" .
+	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.accessibility.interlinking.EstimatedLinkExternalDataProviders" ;
+	lmi:referTo dqm:LinksToExternalDataProvidersMetric .
 
 
 #--- Licensing Dimension ----------------------------------------------------------------------------------------------------
 
 _:HumanReadableLicense a lmi:LuzzuMetricJavaImplementation ;
 	rdfs:label "Human-readable License" ;
-	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.accessibility.licensing.HumanReadableLicense" .
-	
+	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.accessibility.licensing.HumanReadableLicense" ;
+	lmi:referTo dqm:HumanReadableLicenseMetric .
+
 _:MachineReadableLicense a lmi:LuzzuMetricJavaImplementation ;
 	rdfs:label "Machine-readable License" ;
-	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.accessibility.licensing.MachineReadableLicense" .
+	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.accessibility.licensing.MachineReadableLicense" ;
+	lmi:referTo dqm:MachineReadableLicenseMetric .
 
 #--- Performance Dimension ----------------------------------------------------------------------------------------------------
 
 _:HighThroughput a lmi:LuzzuMetricJavaImplementation ;
 	rdfs:label "High Throughput" ;
-	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.accessibility.performance.HighThroughput" .
-	
+	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.accessibility.performance.HighThroughput" ;
+	lmi:referTo dqm:HighThroughputMetric .
+
 _:LowLatency a lmi:LuzzuMetricJavaImplementation ;
 	rdfs:label "Low Latency" ;
-	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.accessibility.performance.LowLatency" .
+	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.accessibility.performance.LowLatency" ;
+	lmi:referTo dqm:LowLatencyMetric .

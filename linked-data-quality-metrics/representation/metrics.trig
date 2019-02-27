@@ -3,13 +3,15 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix lmi: <http://purl.org/eis/vocab/lmi#> .
+@prefix dqm:     <http://purl.org/eis/vocab/dqm#> .
 
 #--- Interoperability Dimension -------------------------------------------------------------------------------------------------
 
 _:ReuseExistingTerms a lmi:LuzzuMetricJavaImplementation ;
 	rdfs:label "Reuse of Existing Terms" ;
 	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.representational.interoperability.ReuseExistingTerms" ;
-	lmi:before _:arg1 .
+	lmi:before _:arg1 ;
+	lmi:referTo dqm:ReuseExistingTermsMetric .
 
 _:arg1 a lmi:LuzzuBeforeArg ;
 	lmi:type "java.lang.String" ;
@@ -19,28 +21,34 @@ _:arg1 a lmi:LuzzuBeforeArg ;
 
 _:NoBlankNodeUsage a lmi:LuzzuMetricJavaImplementation ;
 	rdfs:label "Usage of Blank Nodes" ;
-	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.representational.interpretability.BlankNodeUsage" .
+	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.representational.interpretability.BlankNodeUsage" ;
+	lmi:referTo dqm:NoBlankNodeMetric .
 
 _:UndefinedClassesAndProperties a lmi:LuzzuMetricJavaImplementation ;
 	rdfs:label "Undefined Classes and Properties" ;
-	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.representational.interpretability.UndefinedClassesAndProperties" .
+	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.representational.interpretability.UndefinedClassesAndProperties" ;
+	lmi:referTo dqm:UndefinedClassesAndPropertiesMetric .
 
 #--- Representational Conciseness -----------------------------------------------------------------------------------------------
 
 _:NoProlixRDF a lmi:LuzzuMetricJavaImplementation ;
 	rdfs:label "No Prolix RDF" ;
-	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.representational.conciseness.NoProlixRDF" .
+	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.representational.conciseness.NoProlixRDF" ;
+	lmi:referTo dqm:NoProlixRDFMetric .
 
 _:ShortURIs a lmi:LuzzuMetricJavaImplementation ;
 	rdfs:label "Short URIs" ;
-	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.representational.conciseness.ShortURIs" .
+	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.representational.conciseness.ShortURIs" ;
+	lmi:referTo dqm:ShortURIsMetric .
 
 #--- Versatility ---------------------------------------------------------------------------------------------------------------
 
 _:DifferentSerialisationFormats a lmi:LuzzuMetricJavaImplementation ;
 	rdfs:label "Different Serialisation Formats" ;
-	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.representational.versatility.DifferentSerialisationFormatsCount" .
+	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.representational.versatility.DifferentSerialisationFormatsCount" ;
+	lmi:referTo dqm:DifferentSerialisationsMetric .
 
 _:MultipleLanguageUsage a lmi:LuzzuMetricJavaImplementation ;
 	rdfs:label "Usage of Multiple Languages" ;
-	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.representational.versatility.MultipleLanguageUsage" .
+	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.representational.versatility.MultipleLanguageUsage" ;
+	lmi:referTo dqm:MultipleLanguageUsageMetric .

@@ -3,27 +3,33 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix lmi: <http://purl.org/eis/vocab/lmi#> .
+@prefix dqm:     <http://purl.org/eis/vocab/dqm#> .
 
 #--- Understandability Dimension -------------------------------------------------------------------------------------------------
 
 _:HumanReadableLabelling a lmi:LuzzuMetricJavaImplementation ;
 		rdfs:label "Human Readable Labelling and Description" ;
-		lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.contextual.understandability.HumanReadableLabelling" .
+		lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.contextual.understandability.HumanReadableLabelling" ;
+		lmi:referTo dqm:HumanReadableLabellingMetric .
 
 _:PresenceOfURIRegEx a lmi:LuzzuMetricJavaImplementation ;
 		rdfs:label "Presence of a URI Regex in dataset" ;
-		lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.contextual.understandability.PresenceOfURIRegEx" .
+		lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.contextual.understandability.PresenceOfURIRegEx" ;
+		lmi:referTo dqm:PresenceOfURIRegEx .
 
 _:VocabularyUsageIndication a lmi:LuzzuMetricJavaImplementation ;
 		rdfs:label "Vocabulary Usage Indication" ;
-		lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.contextual.understandability.VocabularyUsageIndication" .
+		lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.contextual.understandability.VocabularyUsageIndication" ;
+		lmi:referTo dqm:VocabularyUsageIndication .
 
 #--- Provenance ---------------------------------------------------------------------------------------------------------------
 
 _:ExtendedProvenanceMetric a lmi:LuzzuMetricJavaImplementation ;
 	rdfs:label "Extended Provenance Metric" ;
-	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.contextual.provenance.ExtendedProvenanceMetric" .
+	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.contextual.provenance.ExtendedProvenanceMetric" ;
+	lmi:referTo dqm:ExtendedProvenanceMetric .
 
 _:BasicProvenanceMetric a lmi:LuzzuMetricJavaImplementation ;
 	rdfs:label "Basic Provenance Metric" ;
-	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.contextual.provenance.BasicProvenanceMetric" .
+	lmi:javaPackageName "io.github.luzzu.linkeddata.qualitymetrics.contextual.provenance.BasicProvenanceMetric" ;
+	lmi:referTo dqm:BasicProvenanceMetric .
