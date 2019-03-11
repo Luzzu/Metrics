@@ -25,7 +25,6 @@ import io.github.luzzu.qualityproblems.ProblemCollection;
 import io.github.luzzu.semantics.commons.ResourceCommons;
 import io.github.luzzu.semantics.vocabularies.DAQ;
 
-
 /**
  * @author Jeremy Debattista
  * 

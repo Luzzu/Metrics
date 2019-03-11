@@ -795,8 +795,12 @@ public class HTTPRetriever {
 			HttpResponse response = httpclient.execute(head);
 			url = response.getHeaders("Location")[0].getValue();
 			httpclient.close();
+		} catch (ArrayIndexOutOfBoundsException e) {
+			 e.printStackTrace();
+			 return targetURL;
 		} catch (IOException e) {
 		      e.printStackTrace();
+		      return targetURL;
 		} finally {
 			head.releaseConnection();
 		}

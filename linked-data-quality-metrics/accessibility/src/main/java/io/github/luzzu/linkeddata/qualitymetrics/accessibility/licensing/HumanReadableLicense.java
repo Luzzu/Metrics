@@ -133,5 +133,4 @@ public class HumanReadableLicense extends AbstractQualityMetric<Boolean> {
 		
 		return activity;
 	}
-
 }

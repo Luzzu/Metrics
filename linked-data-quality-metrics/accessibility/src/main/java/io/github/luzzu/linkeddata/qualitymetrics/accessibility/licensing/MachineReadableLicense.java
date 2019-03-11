@@ -124,5 +124,5 @@ public class MachineReadableLicense extends AbstractQualityMetric<Boolean> {
 		
 		return activity;
 	}
-	
+
 }
