@@ -8,6 +8,7 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,9 +53,11 @@ public class EstimatedDereferenceabilityByTld extends AbstractQualityMetric<Doub
 	 * Constants controlling the maximum number of elements in the reservoir of Top-level Domains and 
 	 * Fully Qualified URIs of each TLD, respectively
 	 */
-	public int MAX_TLDS = 100;
-	public int MAX_FQURIS_PER_TLD = 1000;
+	public int MAX_TLDS = 500;
+	public int MAX_FQURIS_PER_TLD = 100000;
 	
+	private Long totalURIs = 0l;
+
 	/**
 	 * Performs HTTP requests, used to try to fetch identified URIs
 	 */
@@ -72,9 +75,15 @@ public class EstimatedDereferenceabilityByTld extends AbstractQualityMetric<Doub
 	private double metricValue = 0.0;
 	private boolean metricCalculated = false;
 	
+	private long totalDerefUris = 0;
+	private long totalNumberOfResources = 0;
+
+	
 
 	private ProblemCollection<Quad> problemCollection = new ProblemCollectionQuad(DQM.DereferenceabilityMetric);
 	private boolean requireProblemReport = EnvironmentProperties.getInstance().requiresQualityProblemReport();
+
+	private long totalNumberOfTriples = 0;
 	
 	/**
 	 * Processes each triple obtained from the dataset to be assessed (instance declarations, that is, 
@@ -88,17 +97,19 @@ public class EstimatedDereferenceabilityByTld extends AbstractQualityMetric<Doub
 		
 		// we are currently ignoring triples ?s a ?o
 		if (!(quad.getPredicate().getURI().equals(RDF.type.getURI()))){ 
-			
+			totalNumberOfTriples++;
 			String subject = quad.getSubject().toString();
 			if (httpRetriever.isPossibleURL(subject)) {
 				logger.trace("URI found on subject: {}", subject);
 				addUriToDereference(subject);
+				totalNumberOfResources++;
 			}
 
 			String object = quad.getObject().toString();
 			if (httpRetriever.isPossibleURL(object)) {
 				logger.trace("URI found on object: {}", object);
 				addUriToDereference(object);
+				totalNumberOfResources++;
 			}
 		}
 	}
@@ -112,17 +123,14 @@ public class EstimatedDereferenceabilityByTld extends AbstractQualityMetric<Doub
 	public Double metricValue() {
 		
 		if(!this.metricCalculated) {
-			long totalDerefUris = 0;
-			
 			List<String> lstUrisToDeref = new ArrayList<String>();			
 			
 			for(Tld tld : this.tldsReservoir.getItems()){
 				lstUrisToDeref.addAll(tld.getfqUris().getItems());
 			}
-			
-			totalDerefUris = this.deReferenceUris(lstUrisToDeref);
-			this.metricValue = (double)totalDerefUris / (double)lstUrisToDeref.size();
-			
+			this.totalURIs = (long) lstUrisToDeref.size();
+			this.totalDerefUris = this.deReferenceUris(lstUrisToDeref);
+			this.metricValue = (double)this.totalDerefUris / (double)lstUrisToDeref.size();
 		}
 		
 		return this.metricValue;
@@ -243,7 +251,29 @@ public class EstimatedDereferenceabilityByTld extends AbstractQualityMetric<Doub
 		activity.add(mp, RDF.type, DAQ.MetricProfile);
 		
 		//TODO: Add profiling information, including what estimation technique used. See Extensional Conciseness metric
+
 		
+		activity.add(mp, DAQ.totalDatasetTriplesAssessed, ResourceCommons.generateTypeLiteral((long)this.totalNumberOfTriples));
+		activity.add(mp, DQM.totalNumberOfResourcesAssessed, ResourceCommons.generateTypeLiteral((long)this.totalNumberOfResources));
+		activity.add(mp, DQM.totalValidDereferenceableURIs, ResourceCommons.generateTypeLiteral((int)this.totalDerefUris));
+		activity.add(mp, DQM.totalNumberOfResources, ResourceCommons.generateTypeLiteral((long)this.totalURIs));
+		activity.add(mp, DAQ.estimationTechniqueUsed, ModelFactory.createDefaultModel().createResource("https://dblp.uni-trier.de/rec/conf/esws/DebattistaL0A15"));
+
+		
+		Resource ep = ResourceCommons.generateURI();
+		activity.add(mp, DAQ.estimationParameter, ep);
+		activity.add(ep, RDF.type, DAQ.EstimationParameter);
+		activity.add(ep, DAQ.estimationParameterValue, ResourceCommons.generateTypeLiteral(MAX_FQURIS_PER_TLD));
+		activity.add(ep, DAQ.estimationParameterKey, ResourceCommons.generateTypeLiteral("k"));
+		activity.add(ep, RDFS.comment, activity.createLiteral("The size of the reservior for each pay-level domain (pld).", "en"));
+
+		Resource ep2 = ResourceCommons.generateURI();
+		activity.add(mp, DAQ.estimationParameter, ep2);
+		activity.add(ep2, RDF.type, DAQ.EstimationParameter);
+		activity.add(ep2, DAQ.estimationParameterValue, ResourceCommons.generateTypeLiteral(MAX_TLDS));
+		activity.add(ep2, DAQ.estimationParameterKey, ResourceCommons.generateTypeLiteral("plds-k"));
+		activity.add(ep2, RDFS.comment, activity.createLiteral("The size of the global reservior holding the pay-level domains (pld).", "en"));
+
 		return activity;
 	}
 }

@@ -131,8 +131,6 @@
 	<version>2.0</version>
 	<modules>
 		<module>linked-data-quality-metrics</module>
-		
 		<module>utilities</module>
-
 	</modules>
 </project>

@@ -21,6 +21,8 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.impl.StatementImpl;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.vocabulary.RDF;
@@ -34,10 +36,13 @@ import io.github.luzzu.linkeddata.qualitymetrics.commons.HTTPRetriever;
 import io.github.luzzu.linkeddata.qualitymetrics.commons.Utils;
 import io.github.luzzu.linkeddata.qualitymetrics.commons.mapdb.MapDbFactory;
 import io.github.luzzu.linkeddata.qualitymetrics.vocabulary.DQM;
+import io.github.luzzu.linkeddata.qualitymetrics.vocabulary.DQMPROB;
 import io.github.luzzu.operations.properties.EnvironmentProperties;
 import io.github.luzzu.qualityproblems.ProblemCollection;
+import io.github.luzzu.qualityproblems.ProblemCollectionModel;
 import io.github.luzzu.semantics.commons.ResourceCommons;
 import io.github.luzzu.semantics.vocabularies.DAQ;
+import io.github.luzzu.semantics.vocabularies.QPRO;
 
 /**
  * @author Jeremy Debattista
@@ -60,7 +65,9 @@ public class LinkExternalDataProviders extends AbstractQualityMetric<Integer> {
 	 */
 	protected DB mapDB = MapDbFactory.getMapDBAsyncTempFile(LinkExternalDataProviders.class.getName());
 	
-	
+    private ProblemCollection<Model> problemCollection = new ProblemCollectionModel(DQM.LinksToExternalDataProvidersMetric);	
+	private boolean requireProblemReport = EnvironmentProperties.getInstance().requiresQualityProblemReport();
+
 	
 	protected Set<String> setResources = MapDbFactory.createHashSet(mapDB, UUID.randomUUID().toString());
 	
@@ -80,6 +87,8 @@ public class LinkExternalDataProviders extends AbstractQualityMetric<Integer> {
 	protected Set<String> ns404 = new HashSet<String>();
 
 	
+	private long totalLocalPLDs = 0;
+	private long totalTriplesAssessed = 0;
 	
 	@Override
 	public void compute(Quad quad) throws MetricProcessingException {
@@ -89,10 +98,10 @@ public class LinkExternalDataProviders extends AbstractQualityMetric<Integer> {
 		Node object = quad.getObject();
 
 		if (!(predicate.getURI().equals(RDF.type.getURI()))) {
+			totalTriplesAssessed++;
 			if (object.isURI()) {
 				String objectURL = object.getURI();
 				if (!(objectURL.startsWith(localPLD))) { // then it must be an external link
-
 					if ((objectURL.contains("purl.org")) || (objectURL.contains("w3id.org"))) {
 						// we need to resolve the persistance URI
 						String datasetNS = Utils.extractDatasetNS(objectURL);
@@ -103,6 +112,8 @@ public class LinkExternalDataProviders extends AbstractQualityMetric<Integer> {
 						}
 					} 
 					setResources.add(objectURL);
+				} else {
+					totalLocalPLDs++;
 				}
 			}
 		}
@@ -151,10 +162,20 @@ public class LinkExternalDataProviders extends AbstractQualityMetric<Integer> {
 				if (isParsable) {
 					setPLDsRDF.add(targetDatasetNS);
 					break;
-				} 
+				} else {
+					// error
+					if (requireProblemReport) {
+						Quad q = new Quad(null, ResourceCommons.toResource(s).asNode(), QPRO.exceptionDescription.asNode(), DQMPROB.NoValidRDFDataForExternalLink.asNode());
+						((ProblemCollectionModel)problemCollection).addProblem(createProblemModel(q), ResourceCommons.toResource(s));
+					}
+				}
 			} catch (InterruptedException | ExecutionException | TimeoutException e) {
-				//TODO: Catch better exception
-				logger.debug(e.getMessage());
+				// error
+				if (requireProblemReport) {
+					Quad q = new Quad(null, ResourceCommons.toResource(s).asNode(), QPRO.exceptionDescription.asNode(), DQMPROB.NoValidRDFDataForExternalLink.asNode());
+					((ProblemCollectionModel)problemCollection).addProblem(createProblemModel(q), ResourceCommons.toResource(s));
+				}
+//				logger.debug(e.getMessage());
 			}
 		}
  		service.shutdown();
@@ -162,9 +183,8 @@ public class LinkExternalDataProviders extends AbstractQualityMetric<Integer> {
 	}
 	
 	@Override
-	public ProblemCollection<?> getProblemCollection() {
-		// TODO Auto-generated method stub
-		return null;
+	public ProblemCollection<Model> getProblemCollection() {
+		return this.problemCollection;
 	}
 	
 	@Override
@@ -174,10 +194,21 @@ public class LinkExternalDataProviders extends AbstractQualityMetric<Integer> {
 		Resource mp = ResourceCommons.generateURI();
 		activity.add(mp, RDF.type, DAQ.MetricProfile);
 		
-		//TODO: Add profiling information, including what estimation technique used. See Extensional Conciseness metric
+		activity.add(mp, DAQ.totalDatasetTriplesAssessed, ResourceCommons.generateTypeLiteral((long)this.totalTriplesAssessed));
+		activity.add(mp, DQM.totalLocalURIs, ResourceCommons.generateTypeLiteral((long)this.totalLocalPLDs));
+
 		return activity;
 	}
 
+	protected Model createProblemModel(Quad q) {
+		Statement s = new StatementImpl(ResourceCommons.asRDFNode(q.getSubject()).asResource(),
+				ModelFactory.createDefaultModel().createProperty(q.getPredicate().getURI()),
+				ResourceCommons.asRDFNode(q.getObject()));
+		
+		return ModelFactory.createDefaultModel().add(s);
+	}
+
+	
 	class ParsableContentChecker implements Callable<Boolean> {
 		String uri = "";
 		

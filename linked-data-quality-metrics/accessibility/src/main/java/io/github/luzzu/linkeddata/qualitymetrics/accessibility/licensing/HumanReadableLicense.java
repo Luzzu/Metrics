@@ -6,6 +6,8 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.impl.StatementImpl;
 import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
@@ -16,10 +18,13 @@ import org.slf4j.LoggerFactory;
 import io.github.luzzu.exceptions.MetricProcessingException;
 import io.github.luzzu.linkeddata.qualitymetrics.commons.AbstractQualityMetric;
 import io.github.luzzu.linkeddata.qualitymetrics.vocabulary.DQM;
+import io.github.luzzu.linkeddata.qualitymetrics.vocabulary.DQMPROB;
 import io.github.luzzu.operations.properties.EnvironmentProperties;
 import io.github.luzzu.qualityproblems.ProblemCollection;
+import io.github.luzzu.qualityproblems.ProblemCollectionModel;
 import io.github.luzzu.semantics.commons.ResourceCommons;
 import io.github.luzzu.semantics.vocabularies.DAQ;
+import io.github.luzzu.semantics.vocabularies.QPRO;
 
 /**
  * @author Jeremy Debattista
@@ -40,8 +45,10 @@ public class HumanReadableLicense extends AbstractQualityMetric<Boolean> {
 	private LicensingModelClassifier licenseClassifier = new LicensingModelClassifier();
 	
 	
+    private ProblemCollection<Model> problemCollection = new ProblemCollectionModel(DQM.HumanReadableLicenseMetric);	
+	private boolean requireProblemReport = EnvironmentProperties.getInstance().requiresQualityProblemReport();
 
-
+	
 //	private double validLicenses = 0.0d;
 //	private double totalPossibleLicenses = 0.0d;
 	
@@ -56,7 +63,6 @@ public class HumanReadableLicense extends AbstractQualityMetric<Boolean> {
 		setLicensingDocumProps.add("http://schema.org/description");
 		setLicensingDocumProps.add("http://www.w3.org/2004/02/skos/core#altLabel");
 		setLicensingDocumProps.add(DCTerms.rights.getURI());
-
 	}		
 
 	
@@ -76,28 +82,34 @@ public class HumanReadableLicense extends AbstractQualityMetric<Boolean> {
 		Node object = quad.getObject();
 		
 		if (!(subject.isBlank())){
-			if ((subject.getURI().equals(EnvironmentProperties.getInstance().getDatasetPLD()))) {
+			if ((subject.getURI().equals(this.getDatasetURI()))) {
 				if (object.isURI() && licenseClassifier.isLicensingPredicate(predicate)) {
 					if ((licenseClassifier.isCopyLeftLicenseURI(object)) || (licenseClassifier.isNotRecommendedCopyLeftLicenseURI(object))) {
 						this.hasHumanReadableLicense = true;
 						
 						if (licenseClassifier.isNotRecommendedCopyLeftLicenseURI(object)) {
 							// add to problem report as DQMPROB.NotRecommendedLicenceInDataset
+							if (requireProblemReport) {
+								Quad q = new Quad(null, object, QPRO.exceptionDescription.asNode(), DQMPROB.NotRecommendedLicenseInDataset.asNode());
+								((ProblemCollectionModel)problemCollection).addProblem(createProblemModel(q), ResourceCommons.asRDFNode(object).asResource());
+							}
 						}
 					}
 				} else if (object.isLiteral() && setLicensingDocumProps.contains(predicate.getURI())) {
 					this.hasHumanReadableLicense = licenseClassifier.isLicenseStatement(object);
-				} else {
-					// problem
-				}
-			} else {
-				// problem
-			}
+				} 
+			} 
 		}
-		
-
-		
 	}
+	
+	private Model createProblemModel(Quad q) {
+		Statement s = new StatementImpl(ResourceCommons.asRDFNode(q.getSubject()).asResource(),
+				ModelFactory.createDefaultModel().createProperty(q.getPredicate().getURI()),
+				ResourceCommons.asRDFNode(q.getObject()));
+		
+		return ModelFactory.createDefaultModel().add(s);
+	}
+
 	
 
 	public Resource getMetricURI() {
@@ -121,7 +133,14 @@ public class HumanReadableLicense extends AbstractQualityMetric<Boolean> {
 
 	@Override
 	public ProblemCollection<?> getProblemCollection() {
-		return null;
+		if (!this.hasHumanReadableLicense) {
+			if (requireProblemReport) {
+				Quad q = new Quad(null, ResourceCommons.toResource(this.getDatasetURI()).asNode(), QPRO.exceptionDescription.asNode(), DQMPROB.NoValidLicenseInDatasetForHumans.asNode());
+				((ProblemCollectionModel)problemCollection).addProblem(createProblemModel(q), ResourceCommons.toResource(this.getDatasetURI()));
+			}
+		}
+		
+		return problemCollection;
 	}
 
 	@Override

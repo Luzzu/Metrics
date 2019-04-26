@@ -133,36 +133,34 @@ dqm-prob:hasViolatingTriple
 	rdfs:range	rdfs:Resource .
 
 
-### Machine Readable Licence
+###  Licence
 
-dqm-prob:NoValidLicenceInDataset
+dqm-prob:NoValidLicenseInDataset
 	a	rdfs:Class ;
 	rdfs:subClassOf qpro:Exception ;
 	rdfs:comment "The described RDF Document/Dataset has no valid licence in the voID description or in its metadata" ;
 	rdfs:label "No valid machine-readable licence" .
 
 
-dqm-prob:NotRecommendedLicenceInDataset
+dqm-prob:NotRecommendedLicenseInDataset
 	a	rdfs:Class ;
 	rdfs:subClassOf qpro:Exception ;
 	rdfs:comment "The described RDF Document/Dataset has a valid licence that is not recommended according to the voID W3C Standards" ;
 	rdfs:label "Not Recommended machine-readable licence" .
 
-### Machine Readable Licence
-
-dqm-prob:NoValidLicenceInDatasetForHumans
+dqm-prob:NoValidLicenseInDatasetForHumans
 	a	rdfs:Class ;
 	rdfs:subClassOf qpro:Exception ;
 	rdfs:comment "The described RDF Document/Dataset has no valid licence in the in its descriptive metadata" ;
 	rdfs:label "No valid human-readable licence" .
 
 
-dqm-prob:NotMachineReadableLicence
+dqm-prob:NotMachineReadableLicense
 	a	rdfs:Class ;
 	rdfs:subClassOf qpro:Exception ;
 	rdfs:comment "The described license is not in a machine-readable format" ;
 	rdfs:label "Licence is not machine-readable." .
-	
+
 ## Correct URI Usage
 
 dqm-prob:IncorrectCoolURIUsage

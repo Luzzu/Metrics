@@ -51,7 +51,7 @@ public class EstimatedDereferenceability extends AbstractQualityMetric<Double> {
 	/**
 	 * Constants controlling the maximum number of elements in the reservoir of URIs, i.e. sample size
 	 */
-	public int MAX_FQURIS = 6000; //static
+	public int MAX_FQURIS = 100000; //static
 	
 	/**
 	 * Performs HTTP requests, used to try to fetch identified URIs
@@ -72,6 +72,9 @@ public class EstimatedDereferenceability extends AbstractQualityMetric<Double> {
 	private long totalDerefUris = 0;
 	private double metricValue = 0.0;
 	private boolean metricCalculated = false;
+	private long totalNumberOfTriples = 0;
+	private long totalNumberOfResources = 0;
+
 	
 	private ProblemCollection<Quad> problemCollection = new ProblemCollectionQuad(DQM.DereferenceabilityMetric);
 	private boolean requireProblemReport = EnvironmentProperties.getInstance().requiresQualityProblemReport();
@@ -88,6 +91,7 @@ public class EstimatedDereferenceability extends AbstractQualityMetric<Double> {
 		
 		// we are currently ignoring triples ?s a ?o
 		if (!(quad.getPredicate().getURI().equals(RDF.type.getURI()))){ 
+			totalNumberOfTriples++;
 			String subject = quad.getSubject().toString();
 			if (httpRetriever.isPossibleURL(subject)) {
 				// Check also, that the URI has not been already added
@@ -95,6 +99,7 @@ public class EstimatedDereferenceability extends AbstractQualityMetric<Double> {
 					boolean uriAdded = this.fqUrisReservoir.add(subject);
 					logger.trace("URI found on subject: {}, was added to reservoir? {}", subject, uriAdded);
 				}
+				totalNumberOfResources++;
 			}
 
 			String object = quad.getObject().toString();
@@ -104,6 +109,7 @@ public class EstimatedDereferenceability extends AbstractQualityMetric<Double> {
 					boolean uriAdded = this.fqUrisReservoir.add(object);
 					logger.trace("URI found on object: {}, was added to reservoir? {}", object, uriAdded);
 				}
+				totalNumberOfResources++;
 			}
 		}
 	}
@@ -227,7 +233,18 @@ public class EstimatedDereferenceability extends AbstractQualityMetric<Double> {
 		activity.add(mp, RDF.type, DAQ.MetricProfile);
 		
 		//TODO: Add profiling information, including what estimation technique used. See Extensional Conciseness metric
+		activity.add(mp, DAQ.totalDatasetTriplesAssessed, ResourceCommons.generateTypeLiteral((long)this.totalNumberOfTriples));
+		activity.add(mp, DQM.totalNumberOfResourcesAssessed, ResourceCommons.generateTypeLiteral((long)this.totalUris));
+		activity.add(mp, DQM.totalNumberOfResources, ResourceCommons.generateTypeLiteral((long)this.totalNumberOfResources));
+		activity.add(mp, DQM.totalValidDereferenceableURIs, ResourceCommons.generateTypeLiteral((int)this.totalDerefUris));
+		activity.add(mp, DAQ.estimationTechniqueUsed, ModelFactory.createDefaultModel().createResource("http://dbpedia.org/resource/Reservoir_sampling"));
 		
+		Resource ep = ResourceCommons.generateURI();
+		activity.add(mp, DAQ.estimationParameter, ep);
+		activity.add(ep, RDF.type, DAQ.EstimationParameter);
+		activity.add(ep, DAQ.estimationParameterValue, ResourceCommons.generateTypeLiteral(MAX_FQURIS));
+		activity.add(ep, DAQ.estimationParameterKey, ResourceCommons.generateTypeLiteral("k"));
+
 		return activity;
 	}
 }

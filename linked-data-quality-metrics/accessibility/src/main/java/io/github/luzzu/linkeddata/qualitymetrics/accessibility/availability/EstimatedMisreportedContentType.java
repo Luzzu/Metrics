@@ -14,6 +14,7 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +61,9 @@ public class EstimatedMisreportedContentType extends AbstractQualityMetric<Doubl
 	private HTTPRetriever httpRetreiver = new HTTPRetriever();
 	private boolean metricCalculated = false;
 
+	private long totalNumberOfTriples = 0;
+	private long totalNumberOfResources = 0;
+
 
 	private static Logger logger = LoggerFactory.getLogger(EstimatedMisreportedContentType.class);
 	boolean followRedirects = true;
@@ -73,23 +77,26 @@ public class EstimatedMisreportedContentType extends AbstractQualityMetric<Doubl
 	 * Constants controlling the maximum number of elements in the reservoir of Top-level Domains and 
 	 * Fully Qualified URIs of each TLD, respectively
 	 */
-	private static int MAX_TLDS = 10;
-	private static int MAX_FQURIS_PER_TLD = 250;
+	private static int MAX_TLDS = 50;
+	private static int MAX_FQURIS_PER_TLD = 100000;
 	private ReservoirSampler<Tld> tldsReservoir = new ReservoirSampler<Tld>(MAX_TLDS, true);
 	private List<String> uriSet = new ArrayList<String>();
 
 
 	public void compute(Quad quad) throws MetricProcessingException {
 		logger.debug("Computing : {} ", quad.asTriple().toString());
+		totalNumberOfTriples++;
 		
 		String subject = quad.getSubject().toString();
 		if (httpRetreiver.isPossibleURL(subject)){
 			addURIToReservoir(subject);
+			totalNumberOfResources++;
 		}
 		
 		String object = quad.getObject().toString();
 		if (httpRetreiver.isPossibleURL(object)){
 			this.addURIToReservoir(object);
+			totalNumberOfResources++;
 		}
 	}
 
@@ -245,8 +252,29 @@ public class EstimatedMisreportedContentType extends AbstractQualityMetric<Doubl
 		Resource mp = ResourceCommons.generateURI();
 		activity.add(mp, RDF.type, DAQ.MetricProfile);
 		
-		//TODO: Change
 		
+//		correctReportedType, misReportedType, notOkResponses
+		activity.add(mp, DAQ.totalDatasetTriplesAssessed, ResourceCommons.generateTypeLiteral((long)this.totalNumberOfTriples));
+		activity.add(mp, DQM.totalNumberOfResourcesAssessed, ResourceCommons.generateTypeLiteral((misReportedType + correctReportedType)));
+		activity.add(mp, DQM.totalValidContentType, ResourceCommons.generateTypeLiteral((int)correctReportedType));
+		activity.add(mp, DQM.totalNumberOfResources, ResourceCommons.generateTypeLiteral(this.totalNumberOfResources));
+		activity.add(mp, DAQ.estimationTechniqueUsed, ModelFactory.createDefaultModel().createResource("https://dblp.uni-trier.de/rec/conf/esws/DebattistaL0A15"));
+
+
+		Resource ep = ResourceCommons.generateURI();
+		activity.add(mp, DAQ.estimationParameter, ep);
+		activity.add(ep, RDF.type, DAQ.EstimationParameter);
+		activity.add(ep, DAQ.estimationParameterValue, ResourceCommons.generateTypeLiteral(MAX_FQURIS_PER_TLD));
+		activity.add(ep, DAQ.estimationParameterKey, ResourceCommons.generateTypeLiteral("k"));
+		activity.add(ep, RDFS.comment, activity.createLiteral("The size of the reservior for each pay-level domain (pld).", "en"));
+
+		Resource ep2 = ResourceCommons.generateURI();
+		activity.add(mp, DAQ.estimationParameter, ep2);
+		activity.add(ep2, RDF.type, DAQ.EstimationParameter);
+		activity.add(ep2, DAQ.estimationParameterValue, ResourceCommons.generateTypeLiteral(MAX_TLDS));
+		activity.add(ep2, DAQ.estimationParameterKey, ResourceCommons.generateTypeLiteral("plds-k"));
+		activity.add(ep2, RDFS.comment, activity.createLiteral("The size of the global reservior holding the pay-level domains (pld).", "en"));
+
 		return activity;
 	}
 }

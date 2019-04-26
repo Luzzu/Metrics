@@ -16,6 +16,7 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,8 +70,13 @@ public class EstimatedMisreportedContentTypeByStratified extends AbstractQuality
 	 * Constants controlling the maximum number of elements in the reservoir of Top-level Domains and 
 	 * Fully Qualified URIs of each TLD, respectively
 	 */
-	public int MAX_TLDS = 50;
-	public int MAX_FQURIS_PER_TLD = 3000;
+	public int MAX_TLDS = 500;
+	public int MAX_FQURIS_PER_TLD = 100000;
+	
+	private long totalNumberOfTriples = 0;
+	private long totalNumberOfURIs = 0;
+	private long totalCorrectReportedTypes = 0;
+
 	private ReservoirSampler<Tld> tldsReservoir = new ReservoirSampler<Tld>(MAX_TLDS, true);
 	
 	
@@ -78,6 +84,7 @@ public class EstimatedMisreportedContentTypeByStratified extends AbstractQuality
 	 * Stratified Sampling parameters
 	 */
 	private static double POPULATION_PERCENTAGE = 0.2d;
+	private Integer totalSampleSize = 0;
 	private Map<String,Long> tldCount = new ConcurrentHashMap<String,Long>(); 
 	private Long totalURIs = 0l;
 	private Long nonSemanticResources = 0l;
@@ -87,7 +94,8 @@ public class EstimatedMisreportedContentTypeByStratified extends AbstractQuality
 		logger.debug("Computing : {} ", quad.asTriple().toString());
 		
 		if (!(quad.getPredicate().getURI().equals(RDF.type.getURI()))){ 
-			
+			totalNumberOfTriples++;
+
 			String subject = quad.getSubject().toString();
 			if (httpRetriever.isPossibleURL(subject)) {
 				logger.trace("URI found on subject: {}", subject);
@@ -125,14 +133,18 @@ public class EstimatedMisreportedContentTypeByStratified extends AbstractQuality
 	@Override
 	public Double metricValue() {
 		// Collect the list of URIs of the TLDs, to be dereferenced
-		List<String> lstUrisToDeref = new ArrayList<String>(MAX_FQURIS_PER_TLD);			
+//		List<String> lstUrisToDeref = new ArrayList<String>(MAX_FQURIS_PER_TLD);			
+		this.totalSampleSize = (int) Math.min(MAX_FQURIS_PER_TLD, (Math.round((double) totalURIs * POPULATION_PERCENTAGE)));
+		List<String> lstUrisToDeref = new ArrayList<String>(totalSampleSize);	
+
 		
 		for(Tld tld : this.tldsReservoir.getItems()){
 			//Work out ratio for the number of maximum TLDs in Reservior
-			double totalRatio = ((double) tldCount.get(tld.getUri())) * POPULATION_PERCENTAGE;  // ratio between the total number of URIs of a TLD in a dataset against the overall total number of URIs
-			double representativeRatio = totalRatio / ((double) totalURIs * POPULATION_PERCENTAGE); // the ratio of the URIs of a TLD against the population sample for all URIs in a dataset
-			long maxRepresentativeSample = Math.round(representativeRatio * (double) MAX_FQURIS_PER_TLD); // how big should the final reservior for a TLD be wrt the representative ratio
+//			double totalRatio = ((double) tldCount.get(tld.getUri())) * POPULATION_PERCENTAGE;  // ratio between the total number of URIs of a TLD in a dataset against the overall total number of URIs
+//			double representativeRatio = totalRatio / ((double) totalURIs * POPULATION_PERCENTAGE); // the ratio of the URIs of a TLD against the population sample for all URIs in a dataset
+//			long maxRepresentativeSample = Math.round(representativeRatio * (double) MAX_FQURIS_PER_TLD); // how big should the final reservior for a TLD be wrt the representative ratio
 			
+			long maxRepresentativeSample = Math.round(((double) this.totalSampleSize / (double) totalURIs) * ((double) tldCount.get(tld.getUri())));
 			// Re-sample the sample to have the final representative sample
 			if (maxRepresentativeSample > 0){
 				ReservoirSampler<String> _tmpRes = new ReservoirSampler<String>((int)maxRepresentativeSample, true);
@@ -146,8 +158,10 @@ public class EstimatedMisreportedContentTypeByStratified extends AbstractQuality
 		}
 		double metricValue = 0.0;
 		
-		double totalCorrectReportedTypes = this.checkForMisreportedContentType(lstUrisToDeref);
-		metricValue = (double)totalCorrectReportedTypes / ((double)lstUrisToDeref.size() - (double)this.nonSemanticResources);
+		this.totalNumberOfURIs = (lstUrisToDeref.size() + this.nonSemanticResources);
+		
+		this.totalCorrectReportedTypes = this.checkForMisreportedContentType(lstUrisToDeref);
+		metricValue = (double)this.totalCorrectReportedTypes / this.totalNumberOfURIs;
 		
 		return metricValue;
 	}
@@ -273,8 +287,30 @@ public class EstimatedMisreportedContentTypeByStratified extends AbstractQuality
 		Resource mp = ResourceCommons.generateURI();
 		activity.add(mp, RDF.type, DAQ.MetricProfile);
 		
-		//TODO: Change
 		
+		
+		
+		activity.add(mp, DAQ.totalDatasetTriplesAssessed, ResourceCommons.generateTypeLiteral(this.totalNumberOfTriples));
+		activity.add(mp, DQM.totalNumberOfResourcesAssessed, ResourceCommons.generateTypeLiteral(this.totalNumberOfURIs));
+		activity.add(mp, DQM.totalValidContentType, ResourceCommons.generateTypeLiteral(this.totalCorrectReportedTypes));
+		activity.add(mp, DAQ.estimationTechniqueUsed, ModelFactory.createDefaultModel().createResource("http://dbpedia.org/resource/Stratified_sampling"));
+		activity.add(mp, RDFS.comment, activity.createLiteral("The proportionate allocation strategy is used for stratas.", "en"));
+
+		
+		
+		Resource ep = ResourceCommons.generateURI();
+		activity.add(mp, DAQ.estimationParameter, ep);
+		activity.add(ep, RDF.type, DAQ.EstimationParameter);
+		activity.add(ep, DAQ.estimationParameterValue, ResourceCommons.generateTypeLiteral(this.totalSampleSize));
+		activity.add(ep, DAQ.estimationParameterKey, ResourceCommons.generateTypeLiteral("sample size"));
+		
+		Resource ep2 = ResourceCommons.generateURI();
+		activity.add(mp, DAQ.estimationParameter, ep2);
+		activity.add(ep2, RDF.type, DAQ.EstimationParameter);
+		activity.add(ep2, DAQ.estimationParameterValue, ResourceCommons.generateTypeLiteral(this.totalURIs));
+		activity.add(ep2, DAQ.estimationParameterKey, ResourceCommons.generateTypeLiteral("population size"));
+
 		return activity;
+
 	}
 }

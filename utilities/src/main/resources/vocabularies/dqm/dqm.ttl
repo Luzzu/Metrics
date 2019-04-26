@@ -45,14 +45,14 @@ dqm:Availability
 dqm:EndPointAvailabilityMetric
 	a	rdfs:Class ;
 	rdfs:subClassOf	daq:Metric ;
-	daq:expectedDataType xsd:double ;
+	daq:expectedDataType xsd:boolean ;
 	rdfs:comment	"Checks whether the server (endpoint) is reachable and responds to a SPARQL query" ;
 	rdfs:label	"Availability of the SPARQL end-point metric" .
 
 dqm:RDFAvailabilityMetric
 	a	rdfs:Class ;
 	rdfs:subClassOf	daq:Metric ;
-	daq:expectedDataType xsd:double ;
+	daq:expectedDataType xsd:boolean ;
 	rdfs:comment	"Upon request of an RDF dump, checks whether it is provided as result" ;
 	rdfs:label	"Availability of the RDF dumps metric" .
 
@@ -123,14 +123,14 @@ dqm:Licensing
 dqm:MachineReadableLicenseMetric
 	a	rdfs:Class ;
 	rdfs:subClassOf	daq:Metric ;
-	daq:expectedDataType xsd:double ;
+	daq:expectedDataType xsd:boolean ;
 	rdfs:comment	"Verifies that the resource is annotated with a machine-readable indication of the license (e.g. a VoID description or dcterms:license property)" ;
 	rdfs:label	"Machine-readable indication of a license metric" .
 
 dqm:HumanReadableLicenseMetric
 	a	rdfs:Class ;
 	rdfs:subClassOf	daq:Metric ;
-	daq:expectedDataType xsd:double ;
+	daq:expectedDataType xsd:boolean ;
 	rdfs:comment	"Verifies whether a human-readable text, stating the licensing model attributed to the resource, has been provided as part of the dataset" ;
 	rdfs:label	"Human-readable indication of a license metric" .
 
@@ -857,8 +857,7 @@ dqm:totalLocalURIs
 	rdfs:subPropertyOf	daq:abstractProfilingProperty ;
 	rdfs:range	xsd:nonNegativeInteger ;
 	rdfs:label """Total Number of Local URIs"""@en ;
-	rdfs:comment """Profiling property for the Short URIs (RC1) metric, which defines the total number of local URIs in a dataset that were identified during the assessment."""@en .
-
+	rdfs:comment """Profiling property which defines the total number of local URIs in a dataset that were identified during the assessment."""@en .
 
 dqm:totalValidDereferenceableTerms
 	a	rdf:Property ;
@@ -901,6 +900,28 @@ dqm:externalToolUsed
 	rdfs:range	xsd:nonNegativeInteger ;
 	rdfs:label """External Tool"""@en ;
 	rdfs:comment """Profiling property which defines the external tool or library used to assess a particular quality metric (e.g. Language Detection Library)."""@en .
+
+dqm:totalValidDereferenceableURIs
+		a	rdf:Property ;
+		rdfs:subPropertyOf	daq:abstractProfilingProperty ;
+		rdfs:range	xsd:nonNegativeInteger ;
+		rdfs:label """Total Valid Dereferenceable URIs"""@en ;
+		rdfs:comment """Profiling property which defines the total number valid dereferenceable URIs in a dataset."""@en .
+
+dqm:totalNumberOfResourcesAssessed
+	a	rdf:Property ;
+	rdfs:subPropertyOf	daq:abstractProfilingProperty ;
+	rdfs:range	xsd:nonNegativeInteger ;
+	rdfs:label """Total Number of Resources Assessed"""@en ;
+	rdfs:comment """Profiling property which defines the total number of resources assessed in a dataset. In sampling techniques, the value here might be different than in dqm:totalNumberOfResources (if added in the profiling)."""@en .
+
+
+dqm:totalValidContentType
+		a	rdf:Property ;
+		rdfs:subPropertyOf	daq:abstractProfilingProperty ;
+		rdfs:range	xsd:nonNegativeInteger ;
+		rdfs:label """Total Valid Content Type"""@en ;
+		rdfs:comment """Profiling property which defines the total number valid content type used in the resources of a dataset."""@en .
 
 
 ### Extra Provenance Properties

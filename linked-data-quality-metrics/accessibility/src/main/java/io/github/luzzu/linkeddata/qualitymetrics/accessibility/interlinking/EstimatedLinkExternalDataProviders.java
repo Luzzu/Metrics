@@ -21,9 +21,15 @@ import org.slf4j.LoggerFactory;
 import io.github.luzzu.exceptions.MetricProcessingException;
 import io.github.luzzu.linkeddata.qualitymetrics.commons.HTTPRetriever;
 import io.github.luzzu.linkeddata.qualitymetrics.commons.Utils;
+import io.github.luzzu.linkeddata.qualitymetrics.vocabulary.DQM;
+import io.github.luzzu.linkeddata.qualitymetrics.vocabulary.DQMPROB;
+import io.github.luzzu.operations.properties.EnvironmentProperties;
 import io.github.luzzu.qualitymetrics.algorithms.ReservoirSampler;
+import io.github.luzzu.qualityproblems.ProblemCollection;
+import io.github.luzzu.qualityproblems.ProblemCollectionModel;
 import io.github.luzzu.semantics.commons.ResourceCommons;
 import io.github.luzzu.semantics.vocabularies.DAQ;
+import io.github.luzzu.semantics.vocabularies.QPRO;
 
 
 /**
@@ -35,7 +41,15 @@ public class EstimatedLinkExternalDataProviders extends LinkExternalDataProvider
 	
 	final static Logger logger = LoggerFactory.getLogger(EstimatedLinkExternalDataProviders.class);
 	
-	public int reservoirsize = 25;
+    private ProblemCollection<Model> problemCollection = new ProblemCollectionModel(DQM.LinksToExternalDataProvidersMetric);	
+	private boolean requireProblemReport = EnvironmentProperties.getInstance().requiresQualityProblemReport();
+
+	
+	public int reservoirsize = 100000;
+	
+	private long totalLocalPLDs = 0;
+	private long totalTriplesAssessed = 0;
+
 	
 	// A set that holds all unique PLDs together with a sampled set of resources
 	private Map<String, ReservoirSampler<String>> mapPLDs =  new HashMap<String, ReservoirSampler<String>>();
@@ -53,6 +67,7 @@ public class EstimatedLinkExternalDataProviders extends LinkExternalDataProvider
 		Node object = quad.getObject();
 
 		if (!(predicate.getURI().equals(RDF.type.getURI()))) {
+			totalTriplesAssessed++;
 			if (object.isURI()) {
 				String objectURL = object.getURI();
 				if (!(objectURL.startsWith(localPLD))) { // then it must be an external link
@@ -67,6 +82,8 @@ public class EstimatedLinkExternalDataProviders extends LinkExternalDataProvider
 						}
 					} 
 					this.addUriToSampler(objectURL);
+				} else {
+					totalLocalPLDs++;
 				}
 			}
 		}
@@ -109,16 +126,28 @@ public class EstimatedLinkExternalDataProviders extends LinkExternalDataProvider
 					if (isParsable) {
 						setPLDsRDF.add(targetDatasetNS);						
 						break;
-					} 
+					} else {
+						// error
+						if (requireProblemReport) {
+							Quad q = new Quad(null, ResourceCommons.toResource(s).asNode(), QPRO.exceptionDescription.asNode(), DQMPROB.NoValidRDFDataForExternalLink.asNode());
+							((ProblemCollectionModel)problemCollection).addProblem(createProblemModel(q), ResourceCommons.toResource(s));
+						}
+					}
 				} catch (InterruptedException | ExecutionException | TimeoutException e) {
-					//TODO: Catch better exception
-					logger.debug(e.getMessage());
-				} 
+					// error
+					if (requireProblemReport) {
+						Quad q = new Quad(null, ResourceCommons.toResource(s).asNode(), QPRO.exceptionDescription.asNode(), DQMPROB.NoValidRDFDataForExternalLink.asNode());
+						((ProblemCollectionModel)problemCollection).addProblem(createProblemModel(q), ResourceCommons.toResource(s));
+					}
+//					logger.debug(e.getMessage());
+				}
 			}
 		}
  		service.shutdown();
  		System.gc();
 	}
+	
+
 	
 	@Override
 	public boolean isEstimate() {
@@ -132,7 +161,16 @@ public class EstimatedLinkExternalDataProviders extends LinkExternalDataProvider
 		Resource mp = ResourceCommons.generateURI();
 		activity.add(mp, RDF.type, DAQ.MetricProfile);
 		
-		//TODO: Add profiling information, including what estimation technique used. See Extensional Conciseness metric
+		activity.add(mp, DAQ.totalDatasetTriplesAssessed, ResourceCommons.generateTypeLiteral((long)this.totalTriplesAssessed));
+		activity.add(mp, DQM.totalLocalURIs, ResourceCommons.generateTypeLiteral((long)this.totalLocalPLDs));
+		activity.add(mp, DAQ.estimationTechniqueUsed, ModelFactory.createDefaultModel().createResource("http://dbpedia.org/resource/Reservoir_sampling"));
+		
+		Resource ep = ResourceCommons.generateURI();
+		activity.add(mp, DAQ.estimationParameter, ep);
+		activity.add(ep, RDF.type, DAQ.EstimationParameter);
+		activity.add(ep, DAQ.estimationParameterValue, ResourceCommons.generateTypeLiteral(reservoirsize));
+		activity.add(ep, DAQ.estimationParameterKey, ResourceCommons.generateTypeLiteral("k"));
+
 		return activity;
 	}
 	

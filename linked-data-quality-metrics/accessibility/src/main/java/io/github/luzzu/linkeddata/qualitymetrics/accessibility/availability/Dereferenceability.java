@@ -55,6 +55,7 @@ public class Dereferenceability extends AbstractQualityMetric<Double> {
 	private double metricValue = 0.0;
 	private double totalURI = 0;
 	private double dereferencedURI = 0;
+	private Long totalNumberOfTriplesAssessed = 0l;
 	
 	private HTTPRetriever httpRetreiver = new HTTPRetriever();
 	private LinkedDataMetricsCacheManager dcmgr = LinkedDataMetricsCacheManager.getInstance();
@@ -62,7 +63,6 @@ public class Dereferenceability extends AbstractQualityMetric<Double> {
 	private Set<String> uriSet = Collections.synchronizedSet(new HashSet<String>());
 	private boolean metricCalculated = false;
 	
-//	private List<Quad> _problemList = new ArrayList<Quad>();
 	
 	private ProblemCollection<Quad> problemCollection = new ProblemCollectionQuad(DQM.DereferenceabilityMetric);
 	private boolean requireProblemReport = EnvironmentProperties.getInstance().requiresQualityProblemReport();
@@ -72,6 +72,7 @@ public class Dereferenceability extends AbstractQualityMetric<Double> {
 		logger.debug("Computing : {} ", quad.asTriple().toString());
 		
 		if (!(quad.getPredicate().getURI().equals(RDF.type.getURI()))){ // we are currently ignoring triples ?s a ?o
+			totalNumberOfTriplesAssessed++;
 			String subject = quad.getSubject().toString();
 			if (httpRetreiver.isPossibleURL(subject)){
 				uriSet.add(subject);
@@ -106,9 +107,6 @@ public class Dereferenceability extends AbstractQualityMetric<Double> {
 			this.metricCalculated = true;
 		}
 		this.metricValue = this.dereferencedURI / this.totalURI;
-		
-		statsLogger.info("Dereferenceability. Dataset: {} - Total # URIs : {}; # Dereferenced URIs : {}; Previously calculated : {}", 
-				super.getDatasetURI(), totalURI, dereferencedURI, metricCalculated);
 		
 		return this.metricValue;
 	}
@@ -175,9 +173,10 @@ public class Dereferenceability extends AbstractQualityMetric<Double> {
 		Resource mp = ResourceCommons.generateURI();
 		activity.add(mp, RDF.type, DAQ.MetricProfile);
 		
-		//TODO: Change
-		activity.add(mp, DAQ.totalDatasetTriplesAssessed, ResourceCommons.generateTypeLiteral((int)this.totalURI));
-		
+		activity.add(mp, DAQ.totalDatasetTriplesAssessed, ResourceCommons.generateTypeLiteral((long)this.totalNumberOfTriplesAssessed));
+		activity.add(mp, DQM.totalNumberOfResources, ResourceCommons.generateTypeLiteral((long)this.totalURI));
+		activity.add(mp, DQM.totalValidDereferenceableURIs, ResourceCommons.generateTypeLiteral((int)this.dereferencedURI));
+
 		return activity;
 	}
 }

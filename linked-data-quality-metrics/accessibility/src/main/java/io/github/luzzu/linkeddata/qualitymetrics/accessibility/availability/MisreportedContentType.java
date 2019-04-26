@@ -61,11 +61,15 @@ public class MisreportedContentType extends AbstractQualityMetric<Double> {
 	static Logger logger = LoggerFactory.getLogger(MisreportedContentType.class);
 	boolean followRedirects = true;
 	
+	private long totalNumberOfTriples = 0;
+	private long totalNumberOfResources = 0;
+
 	private ProblemCollection<Model> problemCollection = new ProblemCollectionModel(DQM.MisreportedContentTypesMetric);
 	private boolean requireProblemReport = EnvironmentProperties.getInstance().requiresQualityProblemReport();
 
 	public void compute(Quad quad) throws MetricProcessingException {
 		logger.debug("Computing : {} ", quad.asTriple().toString());
+		this.totalNumberOfTriples++;
 		
 		String subject = quad.getSubject().toString();
 		if (httpRetreiver.isPossibleURL(subject)){
@@ -73,6 +77,7 @@ public class MisreportedContentType extends AbstractQualityMetric<Double> {
 			
 			if(!uriSet.contains(subject)) {
 				uriSet.add(subject);
+				this.totalNumberOfResources++;
 			}
 		}
 		
@@ -82,6 +87,7 @@ public class MisreportedContentType extends AbstractQualityMetric<Double> {
 			
 			if(!uriSet.contains(object)) {
 				uriSet.add(object);
+				this.totalNumberOfResources++;
 			}
 		}
 	}
@@ -223,6 +229,11 @@ public class MisreportedContentType extends AbstractQualityMetric<Double> {
 		activity.add(mp, RDF.type, DAQ.MetricProfile);
 		
 		//TODO: Change
+		activity.add(mp, DAQ.totalDatasetTriplesAssessed, ResourceCommons.generateTypeLiteral(this.totalNumberOfTriples));
+		activity.add(mp, DQM.totalNumberOfResourcesAssessed, ResourceCommons.generateTypeLiteral((misReportedType + correctReportedType)));
+		activity.add(mp, DQM.totalValidContentType, ResourceCommons.generateTypeLiteral((int)correctReportedType));
+		activity.add(mp, DQM.totalNumberOfResources, ResourceCommons.generateTypeLiteral(this.totalNumberOfResources));
+
 		
 		return activity;
 	}

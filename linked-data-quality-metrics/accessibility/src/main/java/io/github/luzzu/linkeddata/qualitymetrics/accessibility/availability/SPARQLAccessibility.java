@@ -20,10 +20,13 @@ import org.slf4j.LoggerFactory;
 import io.github.luzzu.exceptions.MetricProcessingException;
 import io.github.luzzu.linkeddata.qualitymetrics.commons.AbstractQualityMetric;
 import io.github.luzzu.linkeddata.qualitymetrics.vocabulary.DQM;
+import io.github.luzzu.linkeddata.qualitymetrics.vocabulary.DQMPROB;
 import io.github.luzzu.operations.properties.EnvironmentProperties;
 import io.github.luzzu.qualityproblems.ProblemCollection;
+import io.github.luzzu.qualityproblems.ProblemCollectionQuad;
 import io.github.luzzu.semantics.commons.ResourceCommons;
 import io.github.luzzu.semantics.vocabularies.DAQ;
+import io.github.luzzu.semantics.vocabularies.QPRO;
 
 /**
  * @author Jeremy Debattista
@@ -40,6 +43,9 @@ public class SPARQLAccessibility extends AbstractQualityMetric<Boolean> {
 	
 	boolean hasAccessibleEndpoint = false;
 	
+	private ProblemCollection<Quad> problemCollection = new ProblemCollectionQuad(DQM.EndPointAvailabilityMetric);
+	private boolean requireProblemReport = EnvironmentProperties.getInstance().requiresQualityProblemReport();
+
 	
 	final static List<String> endpointProperty = new ArrayList<String>();
 	static{
@@ -52,7 +58,7 @@ public class SPARQLAccessibility extends AbstractQualityMetric<Boolean> {
 		logger.debug("Computing : {} ", quad.asTriple().toString());
 		
 		if (!(quad.getSubject().isBlank())) {
-			if ((quad.getSubject().getURI().equals(EnvironmentProperties.getInstance().getDatasetPLD()))
+			if ((quad.getSubject().getURI().equals(super.getDatasetURI()))
 					&& (endpointProperty.contains(quad.getPredicate().getURI()))) {
 	
 				String sparqlQuerystring = "ASK {?s ?p ?o}";
@@ -82,29 +88,6 @@ public class SPARQLAccessibility extends AbstractQualityMetric<Boolean> {
 		return this.METRIC_URI;
 	}
 
-//	@Override
-//	public ProblemList<?> getQualityProblems() {
-//		ProblemList<Quad> tmpProblemList = null;
-//		
-//		if (this.metricValue() == 0){
-//			String resource = this.getDatasetURI();
-//			Resource subject = ModelFactory.createDefaultModel().createResource(resource);
-//			Quad q = new Quad(null, subject.asNode() , QPRO.exceptionDescription.asNode(), DQMPROB.NoEndPointAccessibility.asNode());
-//			this.problemList.add(q);
-//		}
-//		
-//		try {
-//			if(this.problemList != null && this.problemList.size() > 0) {
-//				tmpProblemList = new ProblemList<Quad>(this.problemList);
-//			} else {
-//				tmpProblemList = new ProblemList<Quad>();
-//			}
-//		} catch (ProblemListInitialisationException problemListInitialisationException) {
-//			//TODO
-//		}
-//		return tmpProblemList;
-//	}
-	
 	@Override
 	public boolean isEstimate() {
 		return false;
@@ -119,8 +102,14 @@ public class SPARQLAccessibility extends AbstractQualityMetric<Boolean> {
 
 	@Override
 	public ProblemCollection<?> getProblemCollection() {
-		// TODO Auto-generated method stub
-		return null;
+		if (requireProblemReport) {
+			if (!this.hasAccessibleEndpoint) {
+				Quad q = new Quad(null, ResourceCommons.toResource(super.getDatasetURI()).asNode() , QPRO.exceptionDescription.asNode(), DQMPROB.NoEndPointAccessibility.asNode());
+				problemCollection.addProblem(q);
+			}
+		}
+		
+		return problemCollection;
 	}
 
 	@Override

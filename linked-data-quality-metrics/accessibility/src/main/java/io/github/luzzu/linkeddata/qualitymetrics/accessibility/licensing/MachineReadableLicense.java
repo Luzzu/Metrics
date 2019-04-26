@@ -4,6 +4,8 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.impl.StatementImpl;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.vocabulary.RDF;
@@ -13,10 +15,13 @@ import org.slf4j.LoggerFactory;
 import io.github.luzzu.exceptions.MetricProcessingException;
 import io.github.luzzu.linkeddata.qualitymetrics.commons.AbstractQualityMetric;
 import io.github.luzzu.linkeddata.qualitymetrics.vocabulary.DQM;
+import io.github.luzzu.linkeddata.qualitymetrics.vocabulary.DQMPROB;
 import io.github.luzzu.operations.properties.EnvironmentProperties;
 import io.github.luzzu.qualityproblems.ProblemCollection;
+import io.github.luzzu.qualityproblems.ProblemCollectionModel;
 import io.github.luzzu.semantics.commons.ResourceCommons;
 import io.github.luzzu.semantics.vocabularies.DAQ;
+import io.github.luzzu.semantics.vocabularies.QPRO;
 
 
 /**
@@ -32,7 +37,9 @@ public class MachineReadableLicense extends AbstractQualityMetric<Boolean> {
 	
 	private static Logger logger = LoggerFactory.getLogger(MachineReadableLicense.class);
 	
-	
+    private ProblemCollection<Model> problemCollection = new ProblemCollectionModel(DQM.MachineReadableLicenseMetric);	
+	private boolean requireProblemReport = EnvironmentProperties.getInstance().requiresQualityProblemReport();
+
 	
 	/**
 	 * Allows to determine if a predicate states what is the licensing schema of a resource
@@ -60,7 +67,7 @@ public class MachineReadableLicense extends AbstractQualityMetric<Boolean> {
 		
 		
 		if (!(subject.isBlank())) {
-			if ((subject.getURI().equals(EnvironmentProperties.getInstance().getDatasetPLD()))
+			if ((subject.getURI().equals(this.getDatasetURI()))
 				&& (licenseClassifier.isLicensingPredicate(predicate))) {
 				
 				if (object.isURI()) {
@@ -71,13 +78,23 @@ public class MachineReadableLicense extends AbstractQualityMetric<Boolean> {
 							if (licenseClassifier.containsMachineReadableLicense(licenseModel)) this.hasValidMachineReadableLicense = true;
 							else {
 								// add to problem report as DQMPROB.NotMachineReadableLicense
+								if (requireProblemReport) {
+									Quad q = new Quad(null, object, QPRO.exceptionDescription.asNode(), DQMPROB.NotMachineReadableLicense.asNode());
+									((ProblemCollectionModel)problemCollection).addProblem(createProblemModel(q), ResourceCommons.asRDFNode(object).asResource());
+								}
 							}
 						} catch (Exception e) {
 							// add to problem report as DQMPROB.NotMachineReadableLicense
+							if (requireProblemReport) {
+								Quad q = new Quad(null, object, QPRO.exceptionDescription.asNode(), DQMPROB.NotMachineReadableLicense.asNode());
+								((ProblemCollectionModel)problemCollection).addProblem(createProblemModel(q), ResourceCommons.asRDFNode(object).asResource());
+							}
 						}
-						
 						if (licenseClassifier.isNotRecommendedCopyLeftLicenseURI(object)) {
-							// add to problem report as DQMPROB.NotRecommendedLicenceInDataset
+							if (requireProblemReport) {
+								Quad q = new Quad(null, object, QPRO.exceptionDescription.asNode(), DQMPROB.NotRecommendedLicenseInDataset.asNode());
+								((ProblemCollectionModel)problemCollection).addProblem(createProblemModel(q), ResourceCommons.asRDFNode(object).asResource());
+							}
 						}
 					}
 				}
@@ -85,6 +102,15 @@ public class MachineReadableLicense extends AbstractQualityMetric<Boolean> {
 		}
 		
 	}
+	
+	private Model createProblemModel(Quad q) {
+		Statement s = new StatementImpl(ResourceCommons.asRDFNode(q.getSubject()).asResource(),
+				ModelFactory.createDefaultModel().createProperty(q.getPredicate().getURI()),
+				ResourceCommons.asRDFNode(q.getObject()));
+		
+		return ModelFactory.createDefaultModel().add(s);
+	}
+
 		
 	@Override
 	public Boolean metricValue() {
@@ -111,8 +137,14 @@ public class MachineReadableLicense extends AbstractQualityMetric<Boolean> {
 
 	@Override
 	public ProblemCollection<?> getProblemCollection() {
-		// TODO Auto-generated method stub
-		return null;
+		if (!this.hasValidMachineReadableLicense) {
+			if (requireProblemReport) {
+				Quad q = new Quad(null, ResourceCommons.toResource(this.getDatasetURI()).asNode(), QPRO.exceptionDescription.asNode(), DQMPROB.NoValidLicenseInDataset.asNode());
+				((ProblemCollectionModel)problemCollection).addProblem(createProblemModel(q), ResourceCommons.toResource(this.getDatasetURI()));
+			}
+		}
+		
+		return problemCollection;
 	}
 
 	@Override
