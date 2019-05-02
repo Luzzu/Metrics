@@ -769,7 +769,8 @@ public class HTTPRetriever {
 			// Response received, calculate delay
 			delay = (System.currentTimeMillis() - startTimeStamp);
 		} catch (Exception e){
-			System.out.println(targetUrl);
+//			System.out.println(targetUrl);
+			logger.error(e.getMessage());
 		} finally {
 			// Make sure the stream is closed, thereby freeing network resources associated to this particular trial
 			if(responseStream != null) {
@@ -848,7 +849,12 @@ public class HTTPRetriever {
 		}
 	}
 	
-	public static void main(String [] args) {
-		System.out.println(extractFQDN("http://vocab.getty.edu/aat/"));
-	}
+//	public static void main(String [] args) {
+//		HTTPRetriever httpRetreiver = new HTTPRetriever();
+//		httpRetreiver.addResourceToQueue("http://lodlaundromat.org/200532f619d1d1a06ba3837d25d9d0566##myDS-DS1");
+//		httpRetreiver.start(true);
+//		httpRetreiver.stop();
+//
+////		System.out.println(extractFQDN("http://lodlaundromat.org/200532f619d1d1a06ba3837d25d9d0566##myDS-DS1"));
+//	}
 }

@@ -1033,7 +1033,7 @@ public class VocabularyLoader {
 	}
 	
 	
-//	public static void main(String [] args) {
+//public static void main(String [] args) {
 ////		Node n = ModelFactory.createDefaultModel().createResource("http://dbpedia.org/property/clubB&").asNode();
 //////		System.out.println(VocabularyLoader.getInstance().checkTerm(n));
 //
