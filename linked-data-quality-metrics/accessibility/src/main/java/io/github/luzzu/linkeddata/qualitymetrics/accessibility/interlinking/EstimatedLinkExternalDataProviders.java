@@ -45,7 +45,7 @@ public class EstimatedLinkExternalDataProviders extends LinkExternalDataProvider
 	private boolean requireProblemReport = EnvironmentProperties.getInstance().requiresQualityProblemReport();
 
 	
-	public int reservoirsize = 100000;
+	public int reservoirsize = 10000;
 	
 	private long totalLocalPLDs = 0;
 	private long totalTriplesAssessed = 0;
@@ -69,7 +69,7 @@ public class EstimatedLinkExternalDataProviders extends LinkExternalDataProvider
 		if (!(predicate.getURI().equals(RDF.type.getURI()))) {
 			totalTriplesAssessed++;
 			if (object.isURI()) {
-				String objectURL = object.getURI();
+				String objectURL = Utils.removeProtocol(object.getURI());
 				if (!(objectURL.startsWith(localPLD))) { // then it must be an external link
 
 					if ((objectURL.contains("purl.org")) || (objectURL.contains("w3id.org"))) {
