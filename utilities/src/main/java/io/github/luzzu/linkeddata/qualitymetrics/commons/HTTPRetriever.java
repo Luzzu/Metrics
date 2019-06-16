@@ -849,12 +849,12 @@ public class HTTPRetriever {
 		}
 	}
 	
-//	public static void main(String [] args) {
-//		HTTPRetriever httpRetreiver = new HTTPRetriever();
-//		httpRetreiver.addResourceToQueue("http://lodlaundromat.org/200532f619d1d1a06ba3837d25d9d0566##myDS-DS1");
-//		httpRetreiver.start(true);
-//		httpRetreiver.stop();
+//	public static void main(string [] args) {
+//		httpretriever httpretreiver = new httpretriever();
+//		httpretreiver.addresourcetoqueue("http://lodlaundromat.org/200532f619d1d1a06ba3837d25d9d0566##myds-ds1");
+//		httpretreiver.start(true);
+//		httpretreiver.stop();
 //
-////		System.out.println(extractFQDN("http://lodlaundromat.org/200532f619d1d1a06ba3837d25d9d0566##myDS-DS1"));
+////		system.out.println(extractfqdn("http://lodlaundromat.org/200532f619d1d1a06ba3837d25d9d0566##myds-ds1"));
 //	}
 }

@@ -81,7 +81,7 @@ public class LinkExternalDataProviders extends AbstractQualityMetric<Integer> {
 	protected final Resource METRIC_URI = DQM.LinksToExternalDataProvidersMetric;
 	
 	protected boolean computed = false;
-	protected String localPLD = EnvironmentProperties.getInstance().getDatasetPLD();
+	protected String localPLD = Utils.removeProtocol(this.getDatasetURI());
 
 	protected Map<String,String> resolver = new HashMap<String,String>();
 	protected Set<String> ns404 = new HashSet<String>();
@@ -100,7 +100,7 @@ public class LinkExternalDataProviders extends AbstractQualityMetric<Integer> {
 		if (!(predicate.getURI().equals(RDF.type.getURI()))) {
 			totalTriplesAssessed++;
 			if (object.isURI()) {
-				String objectURL = object.getURI();
+				String objectURL = Utils.removeProtocol(object.getURI());
 				if (!(objectURL.startsWith(localPLD))) { // then it must be an external link
 					if ((objectURL.contains("purl.org")) || (objectURL.contains("w3id.org"))) {
 						// we need to resolve the persistance URI

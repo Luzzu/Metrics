@@ -19,12 +19,13 @@ public class HumanReadableLabellingTest extends Assert {
 	
 	@Test
 	public void labellingTest(){
+		
 		for(Quad q : loader.getStreamingQuads()){
 			metric.compute(q);
 		}
 		
 		assertEquals(0.66667, metric.metricValue(), 0.0001);
 		
-		loader.outputProblemReport(metric.getProblemCollection(), "/Users/jeremy/Desktop/luzzu-quality-tests/Contextual/human-readable-labelling.ttl");
+//		loader.outputProblemReport(metric.getProblemCollection(), "/Users/jeremy/Desktop/luzzu-quality-tests/Contextual/human-readable-labelling.ttl");
 	}
 }

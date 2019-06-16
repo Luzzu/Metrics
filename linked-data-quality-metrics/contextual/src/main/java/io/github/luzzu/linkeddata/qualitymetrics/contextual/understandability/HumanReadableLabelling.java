@@ -45,6 +45,9 @@ public class HumanReadableLabelling extends AbstractQualityMetric<Double>{
 	private Set<String> entitiesWith = MapDbFactory.createHashSet(mapDb, UUID.randomUUID().toString());
 	private Set<String> entitiesUnknown = MapDbFactory.createHashSet(mapDb, UUID.randomUUID().toString()); // have human readable label/description but don't know if it is 
 	
+	
+	private Set<String> allUntypedEntities = MapDbFactory.createHashSet(mapDb, UUID.randomUUID().toString()); // all untyped entities
+			
 	private long entitiesWOSize = 0l;
 	private long entitiesWithSize = 0l;
 
@@ -98,6 +101,9 @@ public class HumanReadableLabelling extends AbstractQualityMetric<Double>{
 					entitiesWithSize++;
 				}
 			}
+			if (allUntypedEntities.contains(entity)) allUntypedEntities.remove(entity);
+		} else {
+			allUntypedEntities.add(quad.getSubject().getURI());
 		}
 	
 		if (quad.getSubject().isURI() && (labelProperties.contains(quad.getPredicate().getURI()))){
@@ -110,7 +116,6 @@ public class HumanReadableLabelling extends AbstractQualityMetric<Double>{
 			} else {
 				entitiesUnknown.add(entity);
 			}
-			
 		}
 	}
 	
@@ -121,9 +126,10 @@ public class HumanReadableLabelling extends AbstractQualityMetric<Double>{
 	}
 	
 	public Double metricValue() {
-		double entities = (entitiesWOSize + entitiesWithSize);
+		double entities = (entitiesWOSize + entitiesWithSize + allUntypedEntities.size());
 		double humanLabels = entitiesWithSize;
 			
+		if (entities == 0) entities = allUntypedEntities.size();
 		value = (humanLabels/entities); 	
 		
 		return value;

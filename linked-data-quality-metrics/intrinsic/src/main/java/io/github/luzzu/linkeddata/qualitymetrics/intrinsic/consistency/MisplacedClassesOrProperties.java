@@ -82,8 +82,9 @@ public class MisplacedClassesOrProperties extends AbstractQualityMetric<Double> 
 						this.misplacedPropertiesCount++;
 						this.createProblemModel(quad.getSubject(), predicate, DQMPROB.MisplacedClass);
 						seenProperties.put(predicate.toString(), false);
+					} else {
+						seenProperties.put(predicate.toString(), true);
 					}
-					seenProperties.put(predicate.toString(), true);
 				}
 			}
 			
@@ -103,8 +104,9 @@ public class MisplacedClassesOrProperties extends AbstractQualityMetric<Double> 
 								this.misplacedClassesCount++;
 								this.createProblemModel(quad.getSubject(), object, DQMPROB.MisplacedProperty);
 								seenClasses.put(object.toString(), false);
+							} else {
+								seenClasses.put(object.toString(), true);
 							}
-							seenClasses.put(object.toString(), true);
 						}
 					}
 				}
@@ -127,6 +129,8 @@ public class MisplacedClassesOrProperties extends AbstractQualityMetric<Double> 
 //			this.problemCollection.addProblem(m);
 			((ProblemCollectionModel)problemCollection).addProblem(m, subject);
 		}
+		
+		
 	}
 
 	/**

@@ -16,5 +16,17 @@ public class Utils {
 			}
 		} else
 			return targetURL;
-	}	
+	}
+	
+	
+	public static String removeProtocol(String URL) {
+		if (URL == null) {
+			return null;
+		}
+		
+		if (URL.contains("://")) {
+			return URL.substring(URL.indexOf("://")+3);
+		} else
+			return URL;
+	}
 }

@@ -57,7 +57,7 @@ public class EstimatedExtensionalConciseness extends AbstractComplexQualityMetri
 	private Long estimatedDuplInstances = new Long(0);
 	private Long totalCreatedInstances = new Long(0);
 	
-	private ProblemCollection<Quad> problemCollection = new ProblemCollectionQuad(DQM.CompatibleDatatype);
+	private ProblemCollection<Quad> problemCollection = new ProblemCollectionQuad(DQM.ExtensionalConcisenessMetric);
 	private boolean requireProblemReport = EnvironmentProperties.getInstance().requiresQualityProblemReport();
 
 	private Long totalTriples = 0l;
